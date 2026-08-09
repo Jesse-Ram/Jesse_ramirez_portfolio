@@ -4,10 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jesse Ramirez — Mechanical &amp; Aerospace Engineer</title>
+  <title>Jesse Ramirez | Mechanical &amp; Aerospace Engineer</title>
   <meta name="description"
-    content="Jesse Ramirez — mechanical engineer (aerospace minor, UC Berkeley) focused on propulsion, thermal systems, structures, and test-driven hardware development.">
+    content="Jesse Ramirez, mechanical engineer (aerospace minor, UC Berkeley) focused on propulsion, thermal systems, structures, and test-driven hardware development.">
   <meta name="color-scheme" content="dark light">
+  <!-- destination image for the cinematic habitat-entry transition, preloaded
+       so it's already decoded by the time the door zoom hands off to it -->
+  <link rel="preload" as="image" href="images/mars-hub-room.jpg">
   <script>
     // This page is a cinematic photo-backed experience with no theme toggle —
     // it only ever reads correctly in dark mode (light-theme cards would fight
@@ -2190,6 +2193,58 @@
       background-image: linear-gradient(90deg, rgba(5, 6, 8, .9) 0%, rgba(5, 6, 8, .58) 36%, rgba(5, 6, 8, .18) 60%, transparent 78%),
         linear-gradient(0deg, rgba(5, 6, 8, .5), transparent 42%),
         url("images/mars-exterior-v2.jpg");
+      transform: scale(1);
+      transform-origin: 54% 55%;
+      will-change: transform, filter;
+    }
+
+    /* ---------- CINEMATIC HABITAT-ENTRY TRANSITION ----------
+       Zooms #stage-exterior .bg in on the door (same 54%/55% anchor as the
+       door-hotspot), adds a brief blur + restrained blue atmosphere + edge
+       vignette, then hands off to the hub stage near the midpoint. Driven by
+       the Web Animations API in JS below; these rules just hide the chrome
+       and hold the two overlay layers. */
+    .enter-transition-tint,
+    .enter-transition-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .enter-transition-tint {
+      background: radial-gradient(circle at 54% 55%, rgba(120, 175, 225, .22) 0%, rgba(85, 140, 195, .12) 45%, rgba(40, 70, 110, 0) 75%);
+      mix-blend-mode: screen;
+    }
+
+    .enter-transition-vignette {
+      background: radial-gradient(circle at 54% 55%, rgba(0, 0, 0, 0) 32%, rgba(0, 0, 0, .6) 100%);
+    }
+
+    body.entering .stage-hud,
+    body.entering .exterior-content,
+    body.entering .stage-status-bar,
+    body.entering .door-hotspot-wrap {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .16s ease;
+    }
+
+    body.entering #stage-exterior {
+      pointer-events: none;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: .5s;
+      animation-timing-function: cubic-bezier(.4, 0, .2, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #stage-exterior .bg {
+        will-change: auto;
+      }
     }
 
     #stage-hub .bg {
@@ -2211,7 +2266,7 @@
       flex-direction: column;
       justify-content: center;
       padding: 0 7vw;
-      max-width: 620px;
+      max-width: 700px;
       color: #f3f5f7;
     }
 
@@ -2237,8 +2292,12 @@
       color: #dbe4ea;
       font-size: 15.5px;
       line-height: 1.65;
-      max-width: 460px;
+      max-width: 600px;
       margin-top: 20px;
+    }
+
+    .exterior-content .sub+.sub {
+      margin-top: 10px;
     }
 
     .exterior-content .tag-row {
@@ -2250,9 +2309,16 @@
       margin-top: 22px;
     }
 
-    .exterior-content .door-hotspot {
-      margin-top: 28px;
-      align-self: flex-start;
+    /* door hotspot — positioned over the habitat doorway in mars-exterior-v2.jpg
+       (measured against the native 1490x832 image: door opening centers around
+       x 54%, y 55%). background-position:center keeps this accurate across
+       viewport widths since cover-cropping stays symmetric about the center. */
+    .door-hotspot-wrap {
+      position: absolute;
+      left: 54%;
+      top: 55%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
     }
 
     /* door / secondary buttons — subtle, no pulsing glow */
@@ -2586,6 +2652,17 @@
 
       .exterior-content {
         max-width: 100%;
+      }
+
+      /* the door-on-image overlay only reads correctly on wide/desktop crops;
+         on narrow viewports background-size:cover crops the image too far
+         horizontally for the door position to stay accurate, so drop the
+         button to a fixed, centered position near the bottom instead. */
+      .door-hotspot-wrap {
+        left: 50%;
+        top: auto;
+        bottom: 6vh;
+        transform: translateX(-50%);
       }
 
       /* background-size:cover crops mars-hub-room.jpg horizontally on tall/narrow
@@ -3457,7 +3534,7 @@
 
 <body class="experience" data-stage="exterior">
 
-  <a class="skip-link" href="directory.html">Skip visual experience — go to plain project directory</a>
+  <a class="skip-link" href="directory.html">Skip visual experience and go to the plain project directory</a>
 
   <div class="stage-hud">
     <button class="brand" type="button" data-home aria-label="Return to the beginning">
@@ -3468,7 +3545,7 @@
       <button class="exit-habitat" type="button" data-exit><span class="full">← Exit Habitat</span><span
           class="short">← Exit</span></button>
       <a href="Jesse_R_Resume_2026.pdf" download>Résumé</a>
-      <a href="about.html#contact">Contact</a>
+      <a href="contact.html">Contact</a>
     </div>
   </div>
 
@@ -3476,12 +3553,22 @@
     <!-- STAGE 1 — EXTERIOR -->
     <section class="stage" id="stage-exterior">
       <div class="bg" aria-hidden="true"></div>
+      <div class="enter-transition-tint" aria-hidden="true"></div>
+      <div class="enter-transition-vignette" aria-hidden="true"></div>
       <div class="exterior-content">
         <div class="eyebrow reveal">Mechanical &amp; Aerospace Engineer</div>
         <h1 class="reveal">Jesse Ramirez</h1>
-        <p class="sub reveal">I design, analyze, and test mechanical hardware for demanding aerospace
-          environments — regeneratively cooled engines, pressure-fed test systems, and flight structures.</p>
+        <p class="sub reveal">I'm a mechanical engineer interested in turning complex ideas into reliable, working
+          hardware.</p>
+        <p class="sub reveal">My interests span mechanical design, structures, thermal-fluid systems, propulsion,
+          manufacturing, and testing, especially in aerospace applications where these disciplines must work
+          together.</p>
+        <p class="sub reveal">I enjoy the full engineering process, from requirements and first-principles analysis
+          to CAD, manufacturing, and physical testing. I'm most motivated by challenging projects that produce real
+          hardware, useful data, and a better-informed next design.</p>
         <div class="tag-row reveal">Propulsion · Structures · Thermal · Test Engineering</div>
+      </div>
+      <div class="door-hotspot-wrap">
         <button class="door-hotspot reveal" type="button" data-door
           aria-label="Enter the habitat and view projects">Enter Database <span aria-hidden="true">→</span></button>
       </div>
@@ -3525,15 +3612,13 @@
                       <path d="M9 7h6" />
                     </svg></span>01 · PROPULSION</div>
                 <div class="hw-name">Regen Thrust Chamber</div>
-                <div class="hw-spec">1050 lbf · LOX/RP-1 · metal DMP</div>
+                <div class="hw-spec">1,077 lbf · LOX/RP-1 · metal DMP</div>
               </div>
             </button>
             <button class="hw-tile" type="button" data-open-panel="engine-tool">
-              <div class="hw-img-wrap data-preview">
-                <span><b>O/F</b> optimized</span>
-                <span><b>ṁ</b> mass flow rate</span>
-                <span><b>Pc</b> chamber pressure</span>
-              </div>
+              <div class="hw-img-wrap"><img src="images/engine-rpa-sizing-output.jpg"
+                  alt="RPA-generated thrust-chamber contour and engine sizing output: thrust, specific impulse, mass flow rates, and chamber/nozzle geometry"
+                  loading="lazy"></div>
               <div class="hw-meta">
                 <div class="hw-code"><span class="hw-icon"><svg viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -3541,8 +3626,8 @@
                       <path
                         d="M12 3v2.6M12 18.4V21M3 12h2.6M18.4 12H21M5.6 5.6l1.9 1.9M16.5 16.5l1.9 1.9M5.6 18.4l1.9-1.9M16.5 7.5l1.9-1.9" />
                     </svg></span>02 · ANALYSIS</div>
-                <div class="hw-name">Engine Design Automation</div>
-                <div class="hw-spec">Python · interior-point optimization</div>
+                <div class="hw-name">Engine Sizing &amp; Thrust-Chamber Contour</div>
+                <div class="hw-spec">Python · RPA · interior-point optimization</div>
               </div>
             </button>
             <button class="hw-tile" type="button" data-open-panel="ground-systems">
@@ -3617,8 +3702,9 @@
               </div>
             </button>
             <button class="hw-tile" type="button" data-open-panel="spider-seeder">
-              <div class="hw-img-wrap"><img src="images/spider-robot-built-annotated.png"
-                  alt="Annotated photo of the assembled six-legged seed-planting robot" loading="lazy"></div>
+              <div class="hw-img-wrap"><img src="images/spider-seeder-award-cover.jpg"
+                  alt="Spider Seeder hexapod robot on the show table next to the ME 102B Electromechanical Design Award"
+                  loading="lazy"></div>
               <div class="hw-meta">
                 <div class="hw-code"><span class="hw-icon"><svg viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -3681,9 +3767,9 @@
               </svg></div>
             <div class="panel-eyebrow">Project 01 · Propulsion</div>
             <h2 class="panel-title" id="panel-regen-title">Regeneratively Cooled Rocket Thrust Chamber</h2>
-            <p class="proj-desc">I worked on a regeneratively cooled LOX/RP-1 thrust-chamber, where the core
-              challenge was reducing hot-gas-side wall temperature while controlling coolant pressure drop and
-              keeping the channels manufacturable.</p>
+            <p class="proj-desc">I designed a 4.79-kN (1,077 lbf), 540-psi Inconel 718 regeneratively cooled LOX/RP-1 thrust chamber,
+              where the core challenge was reducing hot-gas-side wall temperature while controlling coolant
+              pressure drop and keeping the channels manufacturable within 0.45-mm DMP constraints.</p>
           </div>
           <div class="panel-body">
             <div class="subgrid">
@@ -3699,13 +3785,30 @@
               <div class="subrow">
                 <div class="lab">My Work</div>
                 <div class="body">
-                  <p class="muted">I sized cooling-channel geometry (width, height, count) across two stations, the
-                    throat and the chamber, by building a 1-D thermal-resistance network from the hot gas through the
-                    wall and into the coolant, then solving for the coolant-side heat-transfer coefficient and
-                    pressure drop.</p>
+                  <p class="muted">Starting from the RPA-generated chamber/throat contour, I developed a Python
+                    thermal-hydraulic model of the throat and chamber cooling regions, evaluating coolant velocity,
+                    heat-transfer coefficient, wall thermal resistance, wall temperature, coolant heating, and
+                    pressure loss station by station. I varied channel count, width, and height to search for
+                    feasible geometries, prioritizing thermal performance at the throat first before working to
+                    reduce pressure loss through the longer chamber section, and rejected any geometry that violated
+                    boiling, temperature, pressure-loss, or manufacturing constraints.</p>
                   <div class="callout">The channel ribs behave like fins. Increasing channel height adds wetted area
-                    and improves heat transfer to the coolant — but only until fin efficiency, pressure drop, and
+                    and improves heat transfer to the coolant, but only until fin efficiency, pressure drop, and
                     manufacturing limits take over.</div>
+                </div>
+              </div>
+              <div class="subrow">
+                <div class="lab">Model Inputs</div>
+                <div class="body">
+                  <div class="tags">
+                    <span class="chip">Chamber &amp; throat geometry</span>
+                    <span class="chip">Engine pressure &amp; fuel flow</span>
+                    <span class="chip">RP-1 inlet conditions &amp; thermal properties</span>
+                    <span class="chip">Temp-dependent Inconel 718 properties</span>
+                    <span class="chip">Representative thermal loads</span>
+                    <span class="chip">Min. channel &amp; rib dimensions</span>
+                    <span class="chip">Pressure-loss &amp; boiling constraints</span>
+                  </div>
                 </div>
               </div>
               <div class="subrow">
@@ -3741,11 +3844,29 @@
                 </div>
               </div>
               <div class="subrow">
+                <div class="lab">Outputs</div>
+                <div class="body">
+                  <div class="tags">
+                    <span class="chip">Candidate channel count</span>
+                    <span class="chip">Channel width &amp; height</span>
+                    <span class="chip">Rib thickness</span>
+                    <span class="chip">Estimated wall temperature</span>
+                    <span class="chip">Coolant temperature rise</span>
+                    <span class="chip">Pressure loss</span>
+                    <span class="chip">Boiling &amp; subcooling margins</span>
+                    <span class="chip">Manufacturability checks</span>
+                  </div>
+                </div>
+              </div>
+              <div class="subrow">
                 <div class="lab">What I Learned</div>
                 <div class="body">
                   <p>Optimal channel geometry isn't a single number, it's a balance that shifts station-to-station
                     between cooling performance, pressure budget, and what the printer can actually build. Framing it
-                    as a constrained, multi-objective problem made those tradeoffs explicit instead of accidental.</p>
+                    as a constrained, multi-objective problem made those tradeoffs explicit instead of accidental.
+                    The model produced candidate channel dimensions for the internal CAD geometry and, just as
+                    usefully, surfaced which thermal and hydraulic assumptions most needed validation against test
+                    data.</p>
                 </div>
               </div>
             </div>
@@ -3754,37 +3875,44 @@
               <figure class="fig">
                 <div class="imgwrap contain"><img src="images/regen-cad.jpg" alt="DMP-printed regen thrust chamber"
                     style="max-height:340px"></div>
-                <figcaption><b>Fig 1.1</b> — DMP-printed thrust chamber (UC Berkeley STAR · 3D Systems)</figcaption>
+                <figcaption><b>Fig 1.1</b>. DMP-printed thrust chamber (UC Berkeley STAR · 3D Systems)</figcaption>
               </figure>
               <figure class="fig">
                 <div class="imgwrap cover"><img src="images/proj-fig-1-2-instrumented-chamber-on-the-test-stand.jpg"
                     alt="Test stand"></div>
-                <figcaption><b>Fig 1.2</b> — Instrumented chamber on the test stand</figcaption>
+                <figcaption><b>Fig 1.2</b>. Instrumented chamber on the test stand</figcaption>
               </figure>
               <figure class="fig">
                 <div class="imgwrap contain"><img src="images/proj-fig-1-3-hot-fire-plume.jpg"
                     alt="Hot fire plume"></div>
-                <figcaption><b>Fig 1.3</b> — Hot-fire plume</figcaption>
+                <figcaption><b>Fig 1.3</b>. Hot-fire plume</figcaption>
               </figure>
               <figure class="fig light">
                 <div class="imgwrap contain">
                   <img src="images/proj-fig-1-4-coolant-flow-hot-gas-wall-coolant.jpg" alt="Cooling channel diagram">
                 </div>
-                <figcaption><b>Fig 1.4</b> — Coolant flow: hot gas → wall → coolant</figcaption>
+                <figcaption><b>Fig 1.4</b>. Coolant flow: hot gas → wall → coolant</figcaption>
               </figure>
               <figure class="fig light">
                 <div class="imgwrap contain">
                   <img src="images/proj-fig-1-5-channel-cross-section-ribs-act-as-fins-width-height.jpg"
                     alt="Channel cross section">
                 </div>
-                <figcaption><b>Fig 1.5</b> — Channel cross-section: ribs act as fins (width / height)</figcaption>
+                <figcaption><b>Fig 1.5</b>. Channel cross-section: ribs act as fins (width / height)</figcaption>
               </figure>
               <figure class="fig light">
                 <div class="imgwrap contain">
                   <img src="images/proj-fig-1-6-cooling-channel-geometry-around-the-contour.jpg"
                     alt="Channel geometry">
                 </div>
-                <figcaption><b>Fig 1.6</b> — Cooling-channel geometry around the contour</figcaption>
+                <figcaption><b>Fig 1.6</b>. Cooling-channel geometry around the contour</figcaption>
+              </figure>
+              <figure class="fig">
+                <div class="imgwrap contain"><img src="images/regen-thrust-chamber-contour-rpa.jpg" loading="lazy"
+                    alt="RPA-generated external contour of the thrust chamber and nozzle used as the geometric basis for cooling-channel sizing">
+                </div>
+                <figcaption><b>Fig 1.7</b>. RPA-generated chamber/nozzle contour: the geometric basis for
+                  cooling-channel sizing</figcaption>
               </figure>
             </div>
           </div>
@@ -3801,29 +3929,45 @@
                 <path
                   d="M12 3v2.6M12 18.4V21M3 12h2.6M18.4 12H21M5.6 5.6l1.9 1.9M16.5 16.5l1.9 1.9M5.6 18.4l1.9-1.9M16.5 7.5l1.9-1.9" />
               </svg></div>
-            <div class="panel-eyebrow">Project 02 · Propulsion Analysis / Software</div>
-            <h2 class="panel-title" id="panel-engine-tool-title">Rocket Engine Design Automation Tool</h2>
-            <p class="proj-desc">Manual engine-sizing iteration was slow, so I built a Python tool that couples
-              performance, cooling, and flow models into one constraint-driven design loop.</p>
+            <div class="panel-eyebrow">Project 02 · Propulsion Analysis / Engine Sizing</div>
+            <h2 class="panel-title" id="panel-engine-tool-title">Regen Engine Sizing and Thrust-Chamber Contour</h2>
+            <p class="proj-desc">Converting vehicle-level requirements into an operating point and chamber/nozzle
+              geometry for a pressure-fed LOX/RP-1 engine, from a Python sizing model through RPA into CAD.</p>
+            <div class="process">
+              <div class="step">Requirements</div>
+              <div class="seg"></div>
+              <div class="step">Python Sizing Model</div>
+              <div class="seg"></div>
+              <div class="step">RPA Contour</div>
+              <div class="seg"></div>
+              <div class="step">CAD Integration</div>
+              <div class="seg"></div>
+              <div class="step">Iterate</div>
+            </div>
           </div>
           <div class="panel-body">
             <div class="subgrid">
               <div class="subrow">
-                <div class="lab">Problem</div>
+                <div class="lab">Objective</div>
                 <div class="body">
                   <p>Sizing an engine by hand means re-running performance, cooling, and flow calculations every time
                     a constraint changes, thrust target, chamber pressure, or a channel that turns out
-                    unmanufacturable. That loop needed to be automated so iteration was measured in seconds, not a
-                    spreadsheet rebuild.</p>
+                    unmanufacturable. I needed to convert target thrust, propellants, burn duration, feed
+                    conditions, and vehicle constraints into a defined operating point and geometry, fast enough to
+                    iterate in seconds, not a spreadsheet rebuild.</p>
                 </div>
               </div>
               <div class="subrow">
-                <div class="lab">Approach</div>
+                <div class="lab">Process</div>
                 <div class="body">
-                  <p class="muted">I coupled performance, cooling, and flow models into a single Python tool that
-                    optimizes O/F ratio, propellant mass flow rate, and chamber pressure against thrust and
-                    thermal-margin targets, then sizes cooling-channel geometry against the resulting heat load.</p>
-                  <div class="callout">Treating channel sizing as a constrained optimization, not a lookup table, let
+                  <p class="muted">I built a Python engine-design workflow that evaluates chamber pressure, mixture
+                    ratio, propellant mass flow, thrust, and predicted specific impulse against target and vehicle
+                    constraints. Once an operating point was selected, I entered the resulting parameters into RPA to
+                    generate and evaluate the thrust-chamber and nozzle contour, then transferred those dimensions
+                    into CAD and refined the chamber, throat, nozzle, and interface geometry for manufacturing and
+                    vehicle integration. I iterated between the engine model, RPA, and CAD as operating or packaging
+                    requirements changed.</p>
+                  <div class="callout">Treating engine sizing as a constrained optimization, not a lookup table, let
                     the tool push against manufacturability limits directly instead of me iterating toward them by
                     hand.</div>
                 </div>
@@ -3844,26 +3988,39 @@
                 </div>
               </div>
               <div class="subrow">
-                <div class="lab">Constraints</div>
+                <div class="lab">Selected Operating Point</div>
                 <div class="body">
                   <div class="tags">
-                    <span class="chip hot">O/F ratio</span>
-                    <span class="chip">ṁ · mass flow rate</span>
-                    <span class="chip">Pc · chamber pressure</span>
-                    <span class="chip">interior-point method</span>
-                    <span class="chip">high-aspect-ratio channels</span>
-                    <span class="chip">Python</span>
+                    <span class="chip hot">4.79 kN thrust</span>
+                    <span class="chip">540 psi chamber pressure</span>
+                    <span class="chip">1.81 kg/s total mass flow</span>
+                    <span class="chip">O/F 2.36</span>
+                    <span class="chip">RPA contour generation</span>
+                    <span class="chip">Python · interior-point method</span>
                   </div>
                 </div>
               </div>
               <div class="subrow">
-                <div class="lab">What I Learned</div>
+                <div class="lab">Result</div>
                 <div class="body">
-                  <p>Turning engine sizing into a repeatable, fast design loop paid off well beyond the time saved —
-                    it made the coupling between performance, cooling, and flow legible instead of implicit, so a
-                    change to one constraint immediately showed its cost against the other two.</p>
+                  <p>This workflow produced the design parameters and external contour for the Inconel 718
+                    regenerative thrust chamber, the geometric foundation for cooling-channel development and
+                    detailed manufacturing design. Turning engine sizing into a repeatable, fast design loop paid off
+                    well beyond the time saved, it made the coupling between performance, cooling, and flow legible
+                    instead of implicit, so a change to one constraint immediately showed its cost against the other
+                    two.</p>
                 </div>
               </div>
+            </div>
+
+            <div class="gallery g-2">
+              <figure class="fig">
+                <div class="imgwrap contain"><img src="images/engine-rpa-sizing-output.jpg" loading="lazy"
+                    alt="RPA-generated thrust-chamber and nozzle contour with thrust, specific impulse, mass-flow, and geometry output"
+                    style="max-height:280px"></div>
+                <figcaption><b>Fig 2.1</b>. RPA contour + sizing output: thrust, Isp, mass flow, and chamber/nozzle
+                  geometry</figcaption>
+              </figure>
             </div>
           </div>
         </div>
@@ -3883,7 +4040,7 @@
             <h2 class="panel-title" id="panel-ground-systems-title">Ground &amp; Fluid Systems + Flight-Hardware
               Integration</h2>
             <p class="proj-desc">Before an engine reaches a test stand it needs propellant lines, valves,
-              instrumentation, and flight-ready avionics behind it — I designed and built that system for STAR.</p>
+              instrumentation, and flight-ready avionics behind it. I designed and built that system for STAR.</p>
             <div class="process">
               <div class="step">Requirements</div>
               <div class="seg"></div>
@@ -3955,7 +4112,9 @@
                 <div class="body">
                   <p>Building fluency in the full path from schematic to instrumented, actuated test hardware changed
                     how I read a P&amp;ID, every line is a decision about what happens if that component fails
-                    during a test.</p>
+                    during a test. That paid off on the vehicle itself: after resolving instrumentation, leakage,
+                    and ignition failures during integration, the rocket flew a successful launch and recovery to
+                    roughly 8,000 ft.</p>
                 </div>
               </div>
             </div>
@@ -3965,14 +4124,14 @@
                 <div class="imgwrap contain"><img src="images/star-pid-gse-full.png" loading="lazy"
                     alt="Piping and instrumentation diagram of the full ground-support system for a pressure-fed bipropellant rocket, showing high-pressure nitrogen, oxidizer and fuel fill lines, and instrumentation"
                     style="max-height:340px"></div>
-                <figcaption><b>Fig 3.1</b> — Full ground-support P&amp;ID: pressurant, OX/fuel fill and vent
+                <figcaption><b>Fig 3.1</b>. Full ground-support P&amp;ID: pressurant, OX/fuel fill and vent
                 </figcaption>
               </figure>
               <figure class="fig light">
                 <div class="imgwrap contain"><img src="images/star-pid-feed-system.png" loading="lazy"
                     alt="Feed-system P&amp;ID showing fuel and LOX tanks, valves, pressure transducers, RTDs, load cell, and thermocouple down to the injector">
                 </div>
-                <figcaption><b>Fig 3.2</b> — Feed-system P&amp;ID: tanks, valves, and instrumentation to the injector
+                <figcaption><b>Fig 3.2</b>. Feed-system P&amp;ID: tanks, valves, and instrumentation to the injector
                 </figcaption>
               </figure>
               <figure class="fig">
@@ -3980,7 +4139,7 @@
                     src="images/star-propulsion-assembly.png" loading="lazy"
                     alt="CAD render of the integrated pressure-fed propulsion assembly: pressurant tank, fuel and LOX tanks, feed system, and engine stacked vertically"
                     style="max-height:340px"></div>
-                <figcaption><b>Fig 3.3</b> — The P&amp;ID built as hardware: pressurant, propellant tanks, feed
+                <figcaption><b>Fig 3.3</b>. The P&amp;ID built as hardware: pressurant, propellant tanks, feed
                   system, engine</figcaption>
               </figure>
             </div>
@@ -4000,8 +4159,8 @@
               </svg></div>
             <div class="panel-eyebrow">Project 04 · Propulsion / Injector Design</div>
             <h2 class="panel-title" id="panel-pintle-injector-title">Fixed Pintle Injector</h2>
-            <p class="proj-desc">Throttling on our engine happens at the tank, so the injector geometry is fixed —
-              atomization and mixing have to be right before any metal gets cut, there's no valve downstream to
+            <p class="proj-desc">Throttling on our engine happens at the tank, so the injector geometry is fixed.
+              Atomization and mixing have to be right before any metal gets cut, there's no valve downstream to
               compensate for a bad call here.</p>
             <div class="process">
               <div class="step">Requirements</div>
@@ -4026,7 +4185,7 @@
                     ring of orifices around the tip. Skip distance and annulus width set where the fuel and oxidizer
                     streams first meet, and that intersection is what actually does the atomizing.</p>
                   <div class="callout">Every dimension on this part is a mixing decision before it's a manufacturing
-                    one — annulus width sets fuel film thickness, orifice count and placement set how evenly the
+                    one. Annulus width sets fuel film thickness, orifice count and placement set how evenly the
                     oxidizer sheets across it.</div>
                 </div>
               </div>
@@ -4054,6 +4213,18 @@
                 </div>
               </div>
               <div class="subrow">
+                <div class="lab">Manufacturing</div>
+                <div class="body">
+                  <p class="muted">The radial ring of oxidizer orifices has to be equally spaced around the tip, so
+                    hand-locating each hole wasn't accurate enough. I set the tip up on a rotary table fitted with a
+                    dividing (indexing) plate on the mill, so each hole was positioned by dropping the sector pin into
+                    the next plate hole rather than by reading a dial, then drilled straight through on center.</p>
+                  <div class="callout">A dividing plate turns "equally spaced holes" from a measurement problem into
+                    a counting problem, each index is the same fixed angle, so error doesn't accumulate hole to hole
+                    the way it can when you sight a dial by eye.</div>
+                </div>
+              </div>
+              <div class="subrow">
                 <div class="lab">Cold-Flow Test</div>
                 <div class="body">
                   <p>Cold-flow testing confirmed the spray pattern and mixing behavior matched what the geometry was
@@ -4069,6 +4240,7 @@
                     <span class="chip">Radial oxidizer orifices</span>
                     <span class="chip">Skip distance</span>
                     <span class="chip">Discharge coefficient</span>
+                    <span class="chip">Rotary table + dividing plate</span>
                     <span class="chip">Cold-flow validated</span>
                   </div>
                   <p style="margin-top:12px">Fixed-geometry injectors push nearly all the iteration into CAD and
@@ -4084,7 +4256,7 @@
                     src="images/pintle-injector-section.png" loading="lazy"
                     alt="Cross-section CAD of a fixed pintle injector showing the central pintle post, annular fuel gap, and oxidizer orifices"
                     style="max-height:340px"></div>
-                <figcaption><b>Fig 4.1</b> — Section view: pintle post, annular fuel gap, oxidizer orifices
+                <figcaption><b>Fig 4.1</b>. Section view: pintle post, annular fuel gap, oxidizer orifices
                 </figcaption>
               </figure>
               <figure class="fig">
@@ -4092,8 +4264,21 @@
                     src="images/pintle-injector-exploded.png" loading="lazy"
                     alt="Exploded CAD assembly of the pintle injector showing fasteners, mounting flange, pintle post, and tip"
                     style="max-height:340px"></div>
-                <figcaption><b>Fig 4.2</b> — Exploded assembly: bolted stack for fast between-test iteration
+                <figcaption><b>Fig 4.2</b>. Exploded assembly: bolted stack for fast between-test iteration
                 </figcaption>
+              </figure>
+              <figure class="fig">
+                <div class="imgwrap contain"><img src="images/pintle-injector-rotary-table-drilling.jpg"
+                    loading="lazy"
+                    alt="Pintle tip set up on a rotary table with a dividing indexing plate on the mill for drilling the radial oxidizer orifices">
+                </div>
+                <figcaption><b>Fig 4.3</b>. Rotary table + dividing plate: indexing equal angular spacing between
+                  orifices</figcaption>
+              </figure>
+              <figure class="fig">
+                <div class="imgwrap contain"><img src="images/pintle-injector-finished-machined.jpg" loading="lazy"
+                    alt="Finished machined pintle injector tip and flange, brass tip with copper seal and steel flange, held in hand"></div>
+                <figcaption><b>Fig 4.4</b>. Finished tip: brass pintle post, copper seal, steel flange</figcaption>
               </figure>
             </div>
           </div>
@@ -4177,20 +4362,46 @@
                     informs safer cabin environments and material-screening standards.</p>
                 </div>
               </div>
+              <div class="subrow">
+                <div class="lab">Specimen Machining</div>
+                <div class="body">
+                  <p class="muted">Every specimen was lathe-turned from PMMA stock down to a 3.20 mm diameter to
+                    approximate thermally thin behavior. Plastic doesn't cut like metal on the same lathe, it flexes
+                    under tool pressure instead of resisting it, heats up and gums against the tool instead of
+                    chipping cleanly, and can snap outright if the cut is too aggressive on a long, thin section. I
+                    ran a shallow lead-in, kept spindle speed and feed low enough to avoid frictional heating and
+                    melting the surface finish, and supported the stock on a tailstock center near the cut to keep
+                    the thin diameter from warping or whipping under load.</p>
+                  <div class="callout">With PMMA, heat is the enemy twice over, too much cutting heat softens and
+                    warps the part before you're done machining it, and a warped specimen no longer gives you the
+                    uniform 3.20 mm section the flame-spread model assumes.</div>
+                </div>
+              </div>
             </div>
 
             <div class="gallery g-2">
               <figure class="fig">
                 <div class="imgwrap cover"><img src="images/proj-pmma-sample-burning.jpg"
                     alt="PMMA sample burning"></div>
-                <figcaption><b>Fig 2.1</b> — Black PMMA sample burning under controlled flow (laser-sheet imaging)
+                <figcaption><b>Fig 2.1</b>. Black PMMA sample burning under controlled flow (laser-sheet imaging)
                 </figcaption>
               </figure>
               <figure class="fig light">
                 <div class="imgwrap contain"><img src="images/proj-flame-spread-rate-tracking.jpg"
                     alt="Flame spread-rate tracking"></div>
-                <figcaption><b>Fig 2.2</b> — Flame-front tracking: position &amp; spread-rate extraction from test
+                <figcaption><b>Fig 2.2</b>. Flame-front tracking: position &amp; spread-rate extraction from test
                   video</figcaption>
+              </figure>
+              <figure class="fig">
+                <div class="imgwrap contain"><img src="images/firelab-pmma-lathe-chuck-closeup.jpg" loading="lazy"
+                    alt="3.20 mm PMMA rod held between the lathe chuck and tailstock center while being turned down"></div>
+                <figcaption><b>Fig 2.3</b>. PMMA stock supported between chuck and tailstock center to control
+                  warping</figcaption>
+              </figure>
+              <figure class="fig">
+                <div class="imgwrap contain"><img src="images/firelab-pmma-lathe-shop-wide.jpg" loading="lazy"
+                    alt="Manual lathe used to turn PMMA specimens down to 3.20 mm diameter in the machine shop"></div>
+                <figcaption><b>Fig 2.4</b>. The lathe setup: low spindle speed, shallow lead-in, careful feed</figcaption>
               </figure>
             </div>
           </div>
@@ -4277,33 +4488,33 @@
                 <div class="imgwrap contain"><img
                     src="images/proj-fig-3-1-flat-plate-baseline-ansys-transient-thermal.jpg" alt="Flat plate ANSYS">
                 </div>
-                <figcaption><b>Fig 3.1</b> — Flat-plate baseline (ANSYS transient thermal)</figcaption>
+                <figcaption><b>Fig 3.1</b>. Flat-plate baseline (ANSYS transient thermal)</figcaption>
               </figure>
               <figure class="fig">
                 <div class="imgwrap contain"><img src="images/proj-fig-3-2-honeycomb-geometry.jpg"
                     alt="Honeycomb geometry"></div>
-                <figcaption><b>Fig 3.2</b> — Honeycomb geometry</figcaption>
+                <figcaption><b>Fig 3.2</b>. Honeycomb geometry</figcaption>
               </figure>
               <figure class="fig">
                 <div class="imgwrap contain">
                   <img src="images/proj-fig-3-3-reptile-scale-geometry-best-deformation-resistance.jpg"
                     alt="Reptile scales geometry">
                 </div>
-                <figcaption><b>Fig 3.3</b> — Reptile-scale geometry (best deformation resistance)</figcaption>
+                <figcaption><b>Fig 3.3</b>. Reptile-scale geometry (best deformation resistance)</figcaption>
               </figure>
               <figure class="fig">
                 <div class="imgwrap contain">
                   <img src="images/proj-fig-3-4-tessellated-spikes-strong-in-sim-weak-under-real-hea.jpg"
                     alt="Tessellated spikes geometry">
                 </div>
-                <figcaption><b>Fig 3.4</b> — Tessellated spikes (strong in sim, weak under real heat)</figcaption>
+                <figcaption><b>Fig 3.4</b>. Tessellated spikes (strong in sim, weak under real heat)</figcaption>
               </figure>
               <figure class="fig" style="grid-column:span 2">
                 <div class="imgwrap">
                   <img src="images/proj-fig-3-5-fixed-heat-gun-test-rig-with-thermocouple-daq-instru.jpg"
                     alt="Heat-gun test rig">
                 </div>
-                <figcaption><b>Fig 3.5</b> — Fixed heat-gun test rig with thermocouple / DAQ instrumentation
+                <figcaption><b>Fig 3.5</b>. Fixed heat-gun test rig with thermocouple / DAQ instrumentation
                 </figcaption>
               </figure>
             </div>
@@ -4391,7 +4602,7 @@
               <figure class="fig">
                 <div class="imgwrap contain" style="background:#f4f6f9"><img
                     src="images/proj-fig-4-1-rover-concept-cad-with-deployable-radiator.jpg" alt="Rover CAD"></div>
-                <figcaption><b>Fig 4.1</b> — Rover concept (CAD) with deployable radiator</figcaption>
+                <figcaption><b>Fig 4.1</b>. Rover concept (CAD) with deployable radiator</figcaption>
               </figure>
               <figure class="fig">
                 <div class="placeholder" style="min-height:100%">
@@ -4405,34 +4616,34 @@
                   <div class="t">Hybrid Passive + Active TCS</div>
                   <div class="s">insulation · heaters · radiator · heat pipes · switches</div>
                 </div>
-                <figcaption><b>Fig 4.2</b> — Thermal architecture overview</figcaption>
+                <figcaption><b>Fig 4.2</b>. Thermal architecture overview</figcaption>
               </figure>
             </div>
 
             <div class="table-fig">
               <div class="table-scroll"><img src="images/proj-insulation-trade-study.jpg"
                   alt="Insulation trade study"></div>
-              <div class="table-cap">// Trade study — Insulation method (Aerogel selected, 81.5%)</div>
+              <div class="table-cap">// Trade study: Insulation method (Aerogel selected, 81.5%)</div>
             </div>
             <div class="table-fig">
               <div class="table-scroll"><img src="images/proj-heaters-trade-study.jpg" alt="Heaters trade study">
               </div>
-              <div class="table-cap">// Trade study — Heaters (Patch heaters selected, 65%)</div>
+              <div class="table-cap">// Trade study: Heaters (Patch heaters selected, 65%)</div>
             </div>
             <div class="table-fig">
               <div class="table-scroll"><img src="images/proj-heat-switches-trade-study.jpg"
                   alt="Heat switches trade study"></div>
-              <div class="table-cap">// Trade study — Heat switches (Differential-expansion selected, 70%)</div>
+              <div class="table-cap">// Trade study: Heat switches (Differential-expansion selected, 70%)</div>
             </div>
             <div class="table-fig">
               <div class="table-scroll"><img src="images/proj-heat-pipe-trade-study.jpg" alt="Heat pipe trade study">
               </div>
-              <div class="table-cap">// Trade study — Heat-pipe system (VCHP selected, 66%)</div>
+              <div class="table-cap">// Trade study: Heat-pipe system (VCHP selected, 66%)</div>
             </div>
             <div class="table-fig">
               <div class="table-scroll"><img src="images/proj-radiator-trade-study.jpg" alt="Radiator trade study">
               </div>
-              <div class="table-cap">// Trade study — Radiators (Passive structure radiator selected, 85.5%)</div>
+              <div class="table-cap">// Trade study: Radiators (Passive structure radiator selected, 85.5%)</div>
             </div>
           </div>
         </div>
@@ -4449,9 +4660,9 @@
                   d="M9.3 10.5l-4.8 2.5M14.7 10.5l4.8 2.5M9 8l-3.5-3M15 8l3.5-3M10.2 12l-2.7 6.5M13.8 12l2.7 6.5" />
               </svg></div>
             <div class="panel-eyebrow">Project 08 · Mechatronics / Team Project</div>
-            <div class="tl-meta" style="margin-top:2px">TEAM OF 5 · MY SCOPE — LEG/CHASSIS MECHANICAL DESIGN +
+            <div class="tl-meta" style="margin-top:2px">TEAM OF 5 · MY SCOPE: LEG/CHASSIS MECHANICAL DESIGN +
               DEPTH-SENSING &amp; CONTROL</div>
-            <h2 class="panel-title" id="panel-spider-seeder-title">Spider Seeder — Autonomous Seed-Planting Hexapod
+            <h2 class="panel-title" id="panel-spider-seeder-title">Spider Seeder: Autonomous Seed-Planting Hexapod
             </h2>
             <p class="proj-desc">A six-legged robot that walks to a planting site, senses the ground, and drills and
               seeds at a consistent depth on uneven terrain. I owned the leg mechanism and the depth-sensing logic;
@@ -4487,7 +4698,7 @@
                     transmission and its femur linkage, and how six of those legs mount to the chassis to keep the
                     platform stable and levelable on uneven ground.</p>
                   <div class="callout">A hexapod's terrain tolerance gets decided in the leg linkage, not the
-                    control loop — get the mechanism's range of motion wrong and no amount of gait tuning fixes it
+                    control loop. Get the mechanism's range of motion wrong and no amount of gait tuning fixes it
                     afterward.</div>
                 </div>
               </div>
@@ -4539,21 +4750,21 @@
                 <div class="imgwrap contain"><img src="images/spider-robot-built-annotated.png" loading="lazy"
                     alt="Annotated top and bottom photographs of the assembled six-legged seed-planting robot labeling the chassis, servos, drill, ultrasonic sensor, ESP32, and stepper seed dispenser"
                     style="max-height:280px"></div>
-                <figcaption><b>Fig 8.1</b> — Built and labeled: chassis, servos, drill, ultrasonic sensor, ESP32,
+                <figcaption><b>Fig 8.1</b>. Built and labeled: chassis, servos, drill, ultrasonic sensor, ESP32,
                   seed dispenser</figcaption>
               </figure>
               <figure class="fig">
                 <div class="imgwrap contain" style="background:var(--diagram-matte)"><img
                     src="images/spider-robot-cad-assembly.png" loading="lazy"
                     alt="CAD render of the six-legged seed-planting robot assembly" style="max-height:280px"></div>
-                <figcaption><b>Fig 8.2</b> — Full hexapod assembly (CAD)</figcaption>
+                <figcaption><b>Fig 8.2</b>. Full hexapod assembly (CAD)</figcaption>
               </figure>
               <figure class="fig">
                 <div class="imgwrap contain" style="background:var(--diagram-matte)"><img
                     src="images/spider-robot-leg-detail.png" loading="lazy"
                     alt="CAD render of a single robot leg showing the three-servo joint transmission and femur link"
                     style="max-height:280px"></div>
-                <figcaption><b>Fig 8.3</b> — My scope: single-leg, three-servo transmission</figcaption>
+                <figcaption><b>Fig 8.3</b>. My scope: single-leg, three-servo transmission</figcaption>
               </figure>
             </div>
           </div>
@@ -4570,7 +4781,7 @@
             <p class="proj-desc">My foundation comes from coursework in thermodynamics, heat transfer, fluid
               mechanics, and combustion, and I've applied those fundamentals through rocket engine cooling design,
               ground and fluid systems, spacecraft fire safety research, FDM thermal protection testing, and Mars
-              rover thermal control design — the common thread is first-principles analysis that ends in test data,
+              rover thermal control design. The common thread is first-principles analysis that ends in test data,
               not just a simulation.</p>
             <div class="tags course-strip" style="margin-top:20px">
               <span class="chip">Thermodynamics</span>
@@ -4702,6 +4913,7 @@
                 <div class="tags">
                   <span class="chip">SolidWorks</span>
                   <span class="chip">Siemens NX</span>
+                  <span class="chip">CATIA</span>
                   <span class="chip">Onshape</span>
                   <span class="chip">Fusion 360</span>
                   <span class="chip">Revit</span>
@@ -4715,6 +4927,9 @@
                 <div class="skill-cat-label">Analysis / Simulation</div>
                 <div class="tags">
                   <span class="chip">ANSYS (structural / thermal / transient)</span>
+                  <span class="chip">HyperMesh</span>
+                  <span class="chip">Nastran</span>
+                  <span class="chip">Patran</span>
                   <span class="chip">FEA</span>
                   <span class="chip">CFD fundamentals</span>
                   <span class="chip">First-principles / hand calcs</span>
@@ -4737,6 +4952,7 @@
                   <span class="chip">Solid mechanics</span>
                   <span class="chip">Composites</span>
                   <span class="chip">Failure &amp; load analysis</span>
+                  <span class="chip">Buckling &amp; margin analysis</span>
                   <span class="chip">Recovery &amp; redundancy analysis</span>
                 </div>
               </div>
@@ -4790,71 +5006,67 @@
           <div class="panel-head">
             <div class="panel-eyebrow">Experience Log</div>
             <h2 class="panel-title" id="panel-module-experience-title">Where This Work Has Happened</h2>
-            <p class="proj-desc">Mostly UC Berkeley labs and project teams, plus one industry internship in
-              mechanical HVAC design.</p>
+            <p class="proj-desc">From structural analysis at Boeing to propulsion, thermal, and fluid-systems work
+              across UC Berkeley labs and project teams.</p>
           </div>
           <div class="panel-body">
             <div class="timeline">
               <div class="tl-entry">
-                <div class="tl-head"><span class="org">Space Technology and Rocketry (STAR)</span> — Propulsion Lead
+                <div class="tl-head"><span class="org">The Boeing Company</span> · Structural Analysis Engineer
                 </div>
-                <div class="tl-meta">BERKELEY, CA · SEP 2023 – PRESENT</div>
+                <div class="tl-meta">EVERETT, WA · MAY 2026 – PRESENT</div>
                 <ul class="tl-list">
-                  <li>Designed a regeneratively cooled LOX/RP-1 thrust chamber (1050 lbf) with 3D Systems, applying
-                    DfAM for metal DMP — cooling-channel geometry, wall/feature minimums, post-processing.</li>
-                  <li>Led re-hotfire integration: avionics and flight-hardware prep including wiring diagrams,
-                    harness routing/strain relief, soldered terminations, load-cell integration, and solenoid
-                    actuation checkout.</li>
-                  <li>Designed the full P&amp;ID, CAD model, and physical assembly of a pressure-fed ground/fluid
-                    system (propellant lines, valves, instrumentation) for test operations.</li>
+                  <li>Created and modified finite-element models of 777X interior structures using HyperMesh and
+                    Nastran, applying combined seat-loading cases and reviewing stress results against supplier
+                    specifications.</li>
+                  <li>Independently evaluated supplier structural analyses using hand calculations and
+                    finite-element results, checking static strength, buckling, and yield and ultimate margins for
+                    consistency with engineering requirements.</li>
                 </ul>
               </div>
               <div class="tl-entry">
-                <div class="tl-head"><span class="org">Southland Industries</span> — Design Engineering Intern</div>
+                <div class="tl-head"><span class="org">Southland Industries</span> · Design Engineering Intern</div>
                 <div class="tl-meta">UNION CITY, CA · MAY – AUG 2025</div>
                 <ul class="tl-list">
-                  <li>Built a lab-matrix cooling calculator for the Google Geneva data center to assess power
-                    consumption and water/air cooling demand across lab equipment.</li>
-                  <li>Verified fan-coil-unit cooling capacity against design intent for energy efficiency and spec
-                    compliance.</li>
-                  <li>Executed full design of a 4,250 sq ft tenant-improvement space — load calcs, HVAC layouts, and
-                    mechanical piping.</li>
+                  <li>Built an Excel cooling-load matrix for six Google data-center laboratories, enabling comparison
+                    of server-rack power demand and air-, water-, and hybrid-cooling requirements by equipment type.</li>
+                  <li>Produced load calculations, Revit layouts, piping designs, and construction drawings for a
+                    4,250 sq ft tenant improvement, revising mechanical systems as server quantities and heat loads
+                    changed.</li>
                 </ul>
               </div>
               <div class="tl-entry">
-                <div class="tl-head"><span class="org">Berkeley Fire Lab</span> — Student Researcher (NASA
-                  SoFIE-MIST)</div>
-                <div class="tl-meta">BERKELEY, CA · FEB 2025 – PRESENT</div>
+                <div class="tl-head"><span class="org">Space Technology and Rocketry (STAR)</span> · Propulsion Lead
+                </div>
+                <div class="tl-meta">BERKELEY, CA · SEP 2023 – MAY 2026</div>
                 <ul class="tl-list">
-                  <li>Analyzed oxygen concentration, pressure variation, and preheating via surface heat-flux tests
-                    to validate microgravity flammability models for the ISS investigation.</li>
-                  <li>Led machining and test-fixture fabrication for the burn-testing rig; lathe-machined samples to
-                    3.20 mm for improved thermal characterization.</li>
+                  <li>Designed, manufactured, and tested ablatively and regeneratively cooled LOX/RP-1 engines;
+                    resolved instrumentation, leakage, and ignition failures before a successful launch and recovery
+                    to approximately 8,000 ft.</li>
+                  <li>Designed a 4.79-kN (1,077 lbf), 540-psi Inconel 718 regenerative thrust chamber, sizing
+                    cooling channels against thermal, boiling, pressure-loss, and 0.45-mm DMP manufacturing
+                    constraints with 3D Systems.</li>
+                  <li>Led propulsion requirements, design reviews, procurement, testing, and launch operations while
+                    owning the P&amp;IDs and integration of pressure-regulated vehicle and ground fluid systems.</li>
                 </ul>
               </div>
               <div class="tl-entry">
-                <div class="tl-head"><span class="org">Berkeley Nanotechnology Lab</span> — Student Researcher</div>
-                <div class="tl-meta">BERKELEY, CA · FEB – AUG 2025</div>
+                <div class="tl-head"><span class="org">Berkeley Fire Research Lab</span> · Undergraduate Researcher
+                </div>
+                <div class="tl-meta">BERKELEY, CA · FEB 2025 – MAY 2026</div>
                 <ul class="tl-list">
-                  <li>Supported carbon-nanotube biosensor, energy, and environmental-sensing research; read
-                    schematics and assembled PCB circuitry across sub-teams.</li>
-                  <li>Performed SMD placement and reflow-oven soldering down to 0402 package size.</li>
-                </ul>
-              </div>
-              <div class="tl-entry">
-                <div class="tl-head"><span class="org">NASA L'SPACE Mission Concept Academy</span> — Mechanical
-                  &amp; Thermal Engineer</div>
-                <div class="tl-meta">JAN – MAY 2024</div>
-                <ul class="tl-list">
-                  <li>Led mechanical/thermal design of a Martian recon rover; validated trade studies balancing
-                    performance, weight, and reliability under simulated Martian conditions.</li>
-                  <li>Performed recovery and redundancy analysis on chassis, suspension, and thermal control, with
-                    backup solutions for failure cases.</li>
+                  <li>Supported NASA's SoFIE-MIST investigation aboard the International Space Station by conducting
+                    10–15 PMMA combustion tests per session to study flame spread and limiting oxygen concentration
+                    under spacecraft-relevant conditions.</li>
+                  <li>Varied oxygen concentration, chamber pressure, preheat temperature, applied heat flux,
+                    ignition conditions, and specimen diameter to generate experimental data for evaluating
+                    microgravity flammability models.</li>
+                  <li>Built an actuated sample fixture and instrumented the burn rig with thermocouples, oxygen
+                    sensors, LabVIEW DAQ, and video imaging; lathe-machined 3.20-mm PMMA specimens to approximate
+                    thermally thin behavior.</li>
                 </ul>
               </div>
             </div>
-            <div class="tl-footnote">RSF · FITSTAFF STUDENT LEAD — 2022–2025 — led hiring; reduced room overcapacity
-              from 115% to 80%.</div>
           </div>
         </div>
       </div>
@@ -5024,7 +5236,96 @@
         dbViews.forEach(v => v.hidden = v.getAttribute("data-db-view-panel") !== view);
       }
 
-      door.addEventListener("click", () => setStage("hub", true));
+      // ---- cinematic "enter the habitat" transition ----
+      // Zooms the exterior photo in on the door, blurs through the fastest
+      // part of the zoom, adds a restrained blue atmosphere + edge vignette,
+      // then swaps to the hub stage near the midpoint (via the View
+      // Transition API when the browser supports it, a plain stage swap
+      // otherwise — the existing .stage opacity/filter CSS transition is the
+      // fallback crossfade in that case). Reduced-motion users get a short
+      // crossfade instead of the zoom.
+      let isEntering = false;
+      const exteriorBg = document.querySelector("#stage-exterior .bg");
+      const tintEl = document.querySelector("#stage-exterior .enter-transition-tint");
+      const vignetteEl = document.querySelector("#stage-exterior .enter-transition-vignette");
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const cinematicEasing = "cubic-bezier(.4, 0, .2, 1)"; // controlled accel, soft stop
+
+      function swapToHub() {
+        if (document.startViewTransition) {
+          document.startViewTransition(() => setStage("hub", true));
+        } else {
+          setStage("hub", true);
+        }
+      }
+
+      function enterHabitat() {
+        if (isEntering || body.getAttribute("data-stage") !== "exterior") return;
+        isEntering = true;
+        body.classList.add("entering");
+
+        const canAnimate = exteriorBg && tintEl && vignetteEl && exteriorBg.animate && !prefersReducedMotion.matches;
+
+        if (!canAnimate) {
+          // reduced motion / unsupported browser: short crossfade, no zoom
+          const exteriorSection = document.getElementById("stage-exterior");
+          const fade = exteriorSection.animate
+            ? exteriorSection.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: "ease-out", fill: "forwards" })
+            : null;
+          setTimeout(swapToHub, fade ? 110 : 0);
+          setTimeout(() => {
+            body.classList.remove("entering");
+            isEntering = false;
+            if (fade) exteriorSection.style.opacity = "";
+          }, fade ? 260 : 20);
+          return;
+        }
+
+        const isMobile = window.innerWidth <= 760;
+        const duration = isMobile ? 820 : 1000;
+        const targetScale = isMobile ? 2.0 : 2.8;
+        const midScale = 1 + (targetScale - 1) * 0.6;
+
+        exteriorBg.animate(
+          [
+            { transform: "scale(1)", filter: "blur(0px)", offset: 0 },
+            { transform: `scale(${midScale})`, filter: "blur(9px)", offset: 0.42 },
+            { transform: `scale(${targetScale})`, filter: "blur(1.5px)", offset: 1 }
+          ],
+          { duration, easing: cinematicEasing, fill: "forwards" }
+        );
+
+        tintEl.animate(
+          [
+            { opacity: 0, offset: 0 },
+            { opacity: 1, offset: 0.45 },
+            { opacity: 0, offset: 1 }
+          ],
+          { duration, easing: "ease-in-out", fill: "forwards" }
+        );
+
+        vignetteEl.animate(
+          [
+            { opacity: 0, offset: 0 },
+            { opacity: 1, offset: 0.7 },
+            { opacity: 1, offset: 1 }
+          ],
+          { duration, easing: "ease-in", fill: "forwards" }
+        );
+
+        setTimeout(swapToHub, Math.round(duration * 0.46));
+
+        setTimeout(() => {
+          body.classList.remove("entering");
+          isEntering = false;
+          // reset instantly — exterior stage is hidden behind the hub stage now
+          exteriorBg.getAnimations().forEach(a => a.cancel());
+          tintEl.getAnimations().forEach(a => a.cancel());
+          vignetteEl.getAnimations().forEach(a => a.cancel());
+        }, duration + 40);
+      }
+
+      door.addEventListener("click", enterHabitat);
       monitor.addEventListener("click", () => {
         setDbView("projects");
         setStage("screen", true);

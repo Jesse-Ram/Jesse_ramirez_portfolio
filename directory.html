@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Directory — Jesse Ramirez</title>
+  <title>Directory | Jesse Ramirez</title>
   <meta name="description"
-    content="Jesse Ramirez — mechanical engineer (aerospace minor, UC Berkeley) focused on propulsion, thermal systems, structures, and test-driven hardware development.">
+    content="Jesse Ramirez, mechanical engineer (aerospace minor, UC Berkeley) focused on propulsion, thermal systems, structures, and test-driven hardware development.">
   <meta name="color-scheme" content="dark light">
   <script>
     (function () {
@@ -2845,7 +2845,7 @@
         <a href="about.html#skills">Skills</a>
         <a href="about.html#experience">Experience</a>
         <a href="about.html#resume">Résumé</a>
-        <a href="about.html#contact">Contact</a>
+        <a href="contact.html">Contact</a>
       </nav>
       <button class="theme-toggle" type="button" aria-label="Switch to light theme" aria-pressed="false">
         <svg class="i-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2868,7 +2868,7 @@
         <span class="sec-num">DIRECTORY</span>
         <div class="eyebrow reveal">Plain Project Index</div>
         <h1 class="sec reveal">All eight projects, one page</h1>
-        <p class="sec-lead reveal">The no-frills version — every case study, one click away, no interaction
+        <p class="sec-lead reveal">The no-frills version: every case study, one click away, no interaction
           required. Full write-ups live on the <a href="projects.html">Projects</a> page.</p>
 
         <div class="hw-gallery stagger">
@@ -2878,19 +2878,17 @@
             <div class="hw-meta">
               <div class="hw-code">01 · PROPULSION</div>
               <div class="hw-name">Regen Thrust Chamber</div>
-              <div class="hw-spec">1050 lbf · LOX/RP-1 · metal DMP</div>
+              <div class="hw-spec">1,077 lbf · LOX/RP-1 · metal DMP</div>
             </div>
           </a>
           <a class="hw-tile" href="projects.html#engine-tool">
-            <div class="hw-img-wrap data-preview">
-              <span><b>O/F</b> optimized</span>
-              <span><b>ṁ</b> mass flow rate</span>
-              <span><b>Pc</b> chamber pressure</span>
-            </div>
+            <div class="hw-img-wrap"><img src="images/engine-rpa-sizing-output.jpg"
+                alt="RPA-generated thrust-chamber contour and engine sizing output: thrust, specific impulse, mass flow rates, and chamber/nozzle geometry"
+                loading="lazy"></div>
             <div class="hw-meta">
               <div class="hw-code">02 · ANALYSIS</div>
-              <div class="hw-name">Engine Design Automation</div>
-              <div class="hw-spec">Python · interior-point optimization</div>
+              <div class="hw-name">Engine Sizing &amp; Thrust-Chamber Contour</div>
+              <div class="hw-spec">Python · RPA · interior-point optimization</div>
             </div>
           </a>
           <a class="hw-tile" href="projects.html#ground-systems">
@@ -2948,8 +2946,9 @@
             </div>
           </a>
           <a class="hw-tile" href="projects.html#spider-seeder">
-            <div class="hw-img-wrap"><img src="images/spider-robot-built-annotated.png"
-                alt="Annotated photo of the assembled six-legged seed-planting robot" loading="lazy"></div>
+            <div class="hw-img-wrap"><img src="images/spider-seeder-award-cover.jpg"
+                alt="Spider Seeder hexapod robot on the show table next to the ME 102B Electromechanical Design Award"
+                loading="lazy"></div>
             <div class="hw-meta">
               <div class="hw-code">08 · MECHATRONICS</div>
               <div class="hw-name">Spider Seeder Hexapod</div>
@@ -2958,8 +2957,8 @@
           </a>
         </div>
 
-        <p class="sec-lead reveal" style="margin-top:44px">Looking for background, skills, or a way to reach me?
-          Visit <a href="about.html">About &amp; Contact</a>.</p>
+        <p class="sec-lead reveal" style="margin-top:44px">Looking for background and skills? Visit
+          <a href="about.html">About</a>. Want to get in touch? Visit <a href="contact.html">Contact</a>.</p>
       </div>
     </section>
 
@@ -3033,13 +3032,13 @@
       const DATA = {
         "regen": {
           code: "01 · PROPULSION", title: "Regen Thrust Chamber",
-          desc: "Regeneratively cooled LOX/RP-1 thrust chamber built with 3D Systems, sized to hold wall-temperature and pressure margin while staying manufacturable via metal DMP.",
-          tags: ["1050 lbf", "LOX/RP-1", "Regenerative cooling", "Metal DMP"], img: "images/regen-cad.jpg"
+          desc: "4.79-kN, 540-psi Inconel 718 regeneratively cooled LOX/RP-1 thrust chamber built with 3D Systems, sizing channels against thermal, boiling, pressure-loss, and 0.45-mm DMP manufacturing constraints.",
+          tags: ["4.79 kN / 1,077 lbf", "540 psi", "Inconel 718", "LOX/RP-1", "Metal DMP"], img: "images/regen-cad.jpg"
         },
         "engine-tool": {
-          code: "02 · ANALYSIS", title: "Engine Design Automation",
-          desc: "A Python tool coupling performance, cooling, and flow models into one constraint-driven design loop, using an interior-point method to size cooling-channel geometry.",
-          tags: ["Python", "Interior-point optimization", "O/F · ṁ · Pc"], img: null
+          code: "02 · ANALYSIS", title: "Engine Sizing & Thrust-Chamber Contour",
+          desc: "A Python engine-sizing workflow that converts vehicle-level requirements into an operating point, then generates the thrust-chamber and nozzle contour in RPA before refining it in CAD.",
+          tags: ["Python", "RPA", "Interior-point optimization", "4.79 kN / 540 psi"], img: "images/engine-rpa-sizing-output.jpg"
         },
         "ground-systems": {
           code: "03 · FLUID SYSTEMS", title: "Ground &amp; Fluid Systems",
@@ -3069,7 +3068,7 @@
         "spider-seeder": {
           code: "08 · MECHATRONICS", title: "Spider Seeder Hexapod",
           desc: "A five-person team build: a six-legged seed-planting robot. My scope was the leg mechanism and the ultrasonic depth-sensing logic.",
-          tags: ["6-leg mechanism (mine)", "Depth sensing (mine)", "Team build"], img: "images/spider-robot-built-annotated.png"
+          tags: ["6-leg mechanism (mine)", "Depth sensing (mine)", "Team build"], img: "images/spider-seeder-award-cover.jpg"
         }
       };
 
