@@ -2257,7 +2257,9 @@
         url("images/mars-screen-zoom.jpg");
     }
 
-    /* EXTERIOR — left-aligned identity block */
+    /* EXTERIOR — left-aligned identity block. align-items:flex-start keeps
+       the board at its own intrinsic size instead of being stretched to
+       fill the column by the flex parent. */
     .exterior-content {
       position: relative;
       z-index: 1;
@@ -2265,48 +2267,177 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      align-items: flex-start;
       padding: 0 7vw;
-      max-width: 700px;
       color: #f3f5f7;
     }
 
-    .exterior-content .eyebrow {
-      color: #b9c8d6;
+    /* a "personnel file" board: full-width identity line, a large photo
+       beside the bio rather than stacked above it. Width drives off vw
+       (this layout wants to be wide), height is content-driven with a vh
+       safety cap so it can never exceed the fixed-height hero — the photo
+       stretches to match the bio column's natural height via align-items:
+       stretch on .panel-body, so there's no separate height math to tune.
+       Same dark-glass HUD backdrop as the door/monitor hotspots elsewhere
+       on this page, since a directional gradient alone doesn't hold
+       contrast reliably on wide viewports. */
+    .exterior-panel {
+      position: relative;
+      width: clamp(460px, 36vw, 620px);
+      max-height: 76vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, rgba(7, 10, 15, .68), rgba(7, 10, 15, .48));
+      border: 1px solid rgba(140, 190, 230, .16);
+      border-radius: 14px;
+      padding: clamp(15px, 2.8vh, 32px);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
-    .exterior-content .eyebrow::before {
-      background: #b9c8d6;
+    /* corner-bracket accents, like a targeting/viewfinder frame — reads as
+       an engineering HUD readout rather than a plain rounded card */
+    .panel-corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      border: 0 solid rgba(226, 208, 184, .55);
+    }
+
+    .panel-corner-tl {
+      top: -1px;
+      left: -1px;
+      border-width: 1.5px 0 0 1.5px;
+      border-top-left-radius: 4px;
+    }
+
+    .panel-corner-tr {
+      top: -1px;
+      right: -1px;
+      border-width: 1.5px 1.5px 0 0;
+      border-top-right-radius: 4px;
+    }
+
+    .panel-corner-bl {
+      bottom: -1px;
+      left: -1px;
+      border-width: 0 0 1.5px 1.5px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .panel-corner-br {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 1.5px 1.5px 0;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* identity line: small hex badge + eyebrow label + a rule that fills
+       the rest of the board's width */
+    .panel-topline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: none;
+      color: #b9c8d6;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: clamp(9.5px, 1.15vh, 11.5px);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .topline-icon {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(209, 122, 74, .6);
+      border-radius: 5px;
+      color: var(--accent);
+      background: rgba(209, 122, 74, .08);
+    }
+
+    .topline-rule {
+      flex: 1 1 auto;
+      height: 1px;
+      min-width: 12px;
+      background: rgba(140, 190, 230, .22);
     }
 
     .exterior-content h1 {
+      flex: none;
       font-family: "Archivo", sans-serif;
       font-weight: 800;
       letter-spacing: -.01em;
       text-transform: uppercase;
-      font-size: clamp(38px, 5.6vw, 60px);
-      line-height: 1.04;
-      margin: 18px 0 0;
+      font-size: clamp(26px, 3.6vw, 46px);
+      line-height: 1.05;
+      margin: clamp(6px, 1.2vh, 12px) 0 0;
+      white-space: nowrap;
+    }
+
+    /* photo stretches to the bio column's natural height — no explicit
+       height needed, so the ratio stays proportionate at any panel size */
+    .panel-body {
+      display: flex;
+      align-items: stretch;
+      gap: clamp(16px, 2.6vw, 28px);
+      margin-top: clamp(10px, 1.8vh, 20px);
+      min-height: 0;
+    }
+
+    .id-photo {
+      flex: none;
+      width: clamp(120px, 15vw, 210px);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(160, 205, 235, .55);
+      background: rgba(10, 14, 20, .5);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .45), 0 0 0 4px rgba(140, 190, 230, .07), inset 0 0 0 1px rgba(0, 0, 0, .25);
+    }
+
+    .id-photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 18%;
+      filter: saturate(.9) contrast(1.03);
+    }
+
+    .panel-bio {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .exterior-content .sub {
       color: #dbe4ea;
-      font-size: 15.5px;
-      line-height: 1.65;
-      max-width: 600px;
-      margin-top: 20px;
+      font-size: clamp(11.5px, 1.05vw, 14.5px);
+      line-height: 1.36;
+      margin-top: clamp(6px, 1.1vh, 12px);
     }
 
-    .exterior-content .sub+.sub {
-      margin-top: 10px;
+    .exterior-content .sub:first-child {
+      margin-top: 0;
     }
 
     .exterior-content .tag-row {
+      flex: none;
       font-family: "IBM Plex Mono", monospace;
-      font-size: 11.5px;
-      letter-spacing: .06em;
+      font-size: clamp(10px, 1vw, 12px);
+      letter-spacing: .05em;
       text-transform: uppercase;
       color: var(--accent);
-      margin-top: 22px;
+      margin-top: clamp(10px, 1.8vh, 20px);
+      padding-top: clamp(9px, 1.5vh, 16px);
+      border-top: 1px solid rgba(140, 190, 230, .16);
     }
 
     /* door hotspot — positioned over the habitat doorway in mars-exterior-v2.jpg
@@ -2650,8 +2781,28 @@
         max-height: 80vh;
       }
 
-      .exterior-content {
-        max-width: 100%;
+      /* the photo-beside-bio composition is a desktop/laptop layout; a phone
+         isn't wide enough for a comfortable two-column split at this much
+         text, so stack the photo above the bio instead and let the board
+         take a natural (wrap-driven) height — phones have plenty of vh to
+         scroll-free accommodate that. */
+      .exterior-panel {
+        width: min(84vw, 400px);
+        max-height: none;
+      }
+
+      .exterior-content h1 {
+        white-space: normal;
+      }
+
+      .panel-body {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .id-photo {
+        width: 100px;
+        height: 100px;
       }
 
       /* the door-on-image overlay only reads correctly on wide/desktop crops;
@@ -3556,17 +3707,37 @@
       <div class="enter-transition-tint" aria-hidden="true"></div>
       <div class="enter-transition-vignette" aria-hidden="true"></div>
       <div class="exterior-content">
-        <div class="eyebrow reveal">Mechanical &amp; Aerospace Engineer</div>
-        <h1 class="reveal">Jesse Ramirez</h1>
-        <p class="sub reveal">I'm a mechanical engineer interested in turning complex ideas into reliable, working
-          hardware.</p>
-        <p class="sub reveal">My interests span mechanical design, structures, thermal-fluid systems, propulsion,
-          manufacturing, and testing, especially in aerospace applications where these disciplines must work
-          together.</p>
-        <p class="sub reveal">I enjoy the full engineering process, from requirements and first-principles analysis
-          to CAD, manufacturing, and physical testing. I'm most motivated by challenging projects that produce real
-          hardware, useful data, and a better-informed next design.</p>
-        <div class="tag-row reveal">Propulsion · Structures · Thermal · Test Engineering</div>
+        <div class="exterior-panel">
+          <span class="panel-corner panel-corner-tl" aria-hidden="true"></span>
+          <span class="panel-corner panel-corner-tr" aria-hidden="true"></span>
+          <span class="panel-corner panel-corner-bl" aria-hidden="true"></span>
+          <span class="panel-corner panel-corner-br" aria-hidden="true"></span>
+          <div class="panel-topline reveal">
+            <span class="topline-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.7">
+                <path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z" />
+              </svg>
+            </span>
+            <span>Mechanical &amp; Aerospace Engineer</span>
+            <span class="topline-rule" aria-hidden="true"></span>
+          </div>
+          <h1 class="reveal">Jesse Ramirez</h1>
+          <div class="panel-body">
+            <div class="id-photo reveal"><img src="images/jesse-headshot.jpg" alt="Portrait of Jesse Ramirez"
+                width="220" height="270" loading="eager"></div>
+            <div class="panel-bio">
+              <p class="sub reveal">I'm a mechanical engineer interested in turning complex ideas into reliable,
+                working hardware.</p>
+              <p class="sub reveal">My interests span mechanical design, structures, thermal-fluid systems,
+                propulsion, manufacturing, and testing, especially in aerospace applications where these disciplines
+                must work together.</p>
+              <p class="sub reveal">I enjoy the full engineering process, from requirements and first-principles
+                analysis to CAD, manufacturing, and physical testing. I'm most motivated by challenging projects
+                that produce real hardware, useful data, and a better-informed next design.</p>
+            </div>
+          </div>
+          <div class="tag-row reveal">Propulsion · Structures · Thermal · Test Engineering</div>
+        </div>
       </div>
       <div class="door-hotspot-wrap">
         <button class="door-hotspot reveal" type="button" data-door
@@ -3576,7 +3747,7 @@
 
     <div class="stage-status-bar">
       <span><span class="dot"></span>Systems Online · Link Stable</span>
-      <span>UC Berkeley · 37.8715°N, 122.2730°W</span>
+      <span>Mars · Jezero Crater · 18.4447°N, 77.4508°E</span>
     </div>
 
     <!-- STAGE 2 — HUB (full room; monitor is the hotspot) -->
