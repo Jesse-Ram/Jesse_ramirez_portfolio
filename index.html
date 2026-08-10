@@ -2277,7 +2277,7 @@
        (this layout wants to be wide), height is content-driven with a vh
        safety cap so it can never exceed the fixed-height hero — the photo
        stretches to match the bio column's natural height via align-items:
-       stretch on .panel-body, so there's no separate height math to tune.
+       stretch on .id-row, so there's no separate height math to tune.
        Same dark-glass HUD backdrop as the door/monitor hotspots elsewhere
        on this page, since a directional gradient alone doesn't hold
        contrast reliably on wide viewports. */
@@ -2381,8 +2381,11 @@
     }
 
     /* photo stretches to the bio column's natural height — no explicit
-       height needed, so the ratio stays proportionate at any panel size */
-    .panel-body {
+       height needed, so the ratio stays proportionate at any panel size.
+       Named .id-row (not .panel-body) because .panel-body is already the
+       shared content-area class every project/module overlay panel uses —
+       reusing it here overrode their layout too. */
+    .id-row {
       display: flex;
       align-items: stretch;
       gap: clamp(16px, 2.6vw, 28px);
@@ -2795,7 +2798,7 @@
         white-space: normal;
       }
 
-      .panel-body {
+      .id-row {
         flex-direction: column;
         align-items: flex-start;
       }
@@ -3722,7 +3725,7 @@
             <span class="topline-rule" aria-hidden="true"></span>
           </div>
           <h1 class="reveal">Jesse Ramirez</h1>
-          <div class="panel-body">
+          <div class="id-row">
             <div class="id-photo reveal"><img src="images/jesse-headshot.jpg" alt="Portrait of Jesse Ramirez"
                 width="220" height="270" loading="eager"></div>
             <div class="panel-bio">
