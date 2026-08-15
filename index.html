@@ -2152,6 +2152,12 @@
     .stage {
       position: fixed;
       inset: 0;
+      /* the shared "section { padding: 104px 0 }" scaffold rule below is
+         meant for other pages' normal-flow content sections — it was
+         silently applying to these fixed, full-bleed cinematic stages too,
+         shrinking #stage-exterior's effective box and throwing off every
+         percentage/vh calculation inside .exterior-content. */
+      padding: 0;
       opacity: 0;
       pointer-events: none;
       background: #05070a;
@@ -2194,7 +2200,7 @@
         linear-gradient(0deg, rgba(5, 6, 8, .5), transparent 42%),
         url("images/mars-exterior-v2.jpg");
       transform: scale(1);
-      transform-origin: 54% 55%;
+      transform-origin: 54% 57%;
       will-change: transform, filter;
     }
 
@@ -2214,12 +2220,12 @@
     }
 
     .enter-transition-tint {
-      background: radial-gradient(circle at 54% 55%, rgba(120, 175, 225, .22) 0%, rgba(85, 140, 195, .12) 45%, rgba(40, 70, 110, 0) 75%);
+      background: radial-gradient(circle at 54% 57%, rgba(120, 175, 225, .22) 0%, rgba(85, 140, 195, .12) 45%, rgba(40, 70, 110, 0) 75%);
       mix-blend-mode: screen;
     }
 
     .enter-transition-vignette {
-      background: radial-gradient(circle at 54% 55%, rgba(0, 0, 0, 0) 32%, rgba(0, 0, 0, .6) 100%);
+      background: radial-gradient(circle at 54% 57%, rgba(0, 0, 0, 0) 32%, rgba(0, 0, 0, .6) 100%);
     }
 
     body.entering .stage-hud,
@@ -2257,310 +2263,259 @@
         url("images/mars-screen-zoom.jpg");
     }
 
-    /* EXTERIOR — left-aligned identity block. align-items:flex-start keeps
-       the board at its own intrinsic size instead of being stretched to
-       fill the column by the flex parent. */
+    /* EXTERIOR — left-aligned identity block, anchored to the upper third
+       rather than vertically centered. The door sits at a fixed point in
+       the photo (57% down) independent of how tall this text block is; if
+       the block is centered in the full viewport it can grow down into
+       that same area at some viewport heights. Anchoring near the top
+       keeps a reliable gap between the two regardless of composition
+       height. align-items:flex-start keeps the block at its own intrinsic
+       width instead of being stretched by the flex parent. */
     .exterior-content {
       position: relative;
       z-index: 1;
-      height: 100%;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: flex-start;
-      padding: 0 7vw;
+      padding: 16vh 7vw 0;
       color: #f3f5f7;
     }
 
-    /* a "personnel file" board: full-width identity line, a large photo
-       beside the bio rather than stacked above it. Width drives off vw
-       (this layout wants to be wide), height is content-driven with a vh
-       safety cap so it can never exceed the fixed-height hero — the photo
-       stretches to match the bio column's natural height via align-items:
-       stretch on .id-row, so there's no separate height math to tune.
-       Same dark-glass HUD backdrop as the door/monitor hotspots elsewhere
-       on this page, since a directional gradient alone doesn't hold
-       contrast reliably on wide viewports. */
-    .exterior-panel {
-      position: relative;
-      width: clamp(460px, 36vw, 620px);
-      max-height: 76vh;
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient(135deg, rgba(7, 10, 15, .68), rgba(7, 10, 15, .48));
-      border: 1px solid rgba(140, 190, 230, .16);
-      border-radius: 14px;
-      padding: clamp(15px, 2.8vh, 32px);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-    }
-
-    /* corner-bracket accents, like a targeting/viewfinder frame — reads as
-       an engineering HUD readout rather than a plain rounded card */
-    .panel-corner {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      pointer-events: none;
-      border: 0 solid rgba(226, 208, 184, .55);
-    }
-
-    .panel-corner-tl {
-      top: -1px;
-      left: -1px;
-      border-width: 1.5px 0 0 1.5px;
-      border-top-left-radius: 4px;
-    }
-
-    .panel-corner-tr {
-      top: -1px;
-      right: -1px;
-      border-width: 1.5px 1.5px 0 0;
-      border-top-right-radius: 4px;
-    }
-
-    .panel-corner-bl {
-      bottom: -1px;
-      left: -1px;
-      border-width: 0 0 1.5px 1.5px;
-      border-bottom-left-radius: 4px;
-    }
-
-    .panel-corner-br {
-      bottom: -1px;
-      right: -1px;
-      border-width: 0 1.5px 1.5px 0;
-      border-bottom-right-radius: 4px;
-    }
-
-    /* identity line: small hex badge + eyebrow label + a rule that fills
-       the rest of the board's width */
-    .panel-topline {
+    /* EDITORIAL INTRO — a portrait-led composition instead of a bordered
+       HUD card: no box, no border, no corner brackets. The portrait's
+       height sets the whole composition's scale (clamped to vh so it can
+       never threaten the one-viewport budget); the text sits centered
+       beside it the way a caption sits beside a photograph in print, not
+       inside a UI panel. Legibility comes from the existing photo-darkening
+       gradient on #stage-exterior .bg, not from a glass panel behind the
+       text. */
+    .intro {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: clamp(24px, 3.4vw, 48px);
+      max-width: 36vw;
+    }
+
+    .intro-portrait {
       flex: none;
-      color: #b9c8d6;
-      font-family: "IBM Plex Mono", monospace;
-      font-size: clamp(9.5px, 1.15vh, 11.5px);
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .topline-icon {
-      flex: none;
-      width: 22px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(209, 122, 74, .6);
-      border-radius: 5px;
-      color: var(--accent);
-      background: rgba(209, 122, 74, .08);
-    }
-
-    .topline-rule {
-      flex: 1 1 auto;
-      height: 1px;
-      min-width: 12px;
-      background: rgba(140, 190, 230, .22);
-    }
-
-    .exterior-content h1 {
-      flex: none;
-      font-family: "Archivo", sans-serif;
-      font-weight: 800;
-      letter-spacing: -.01em;
-      text-transform: uppercase;
-      font-size: clamp(26px, 3.6vw, 46px);
-      line-height: 1.05;
-      margin: clamp(6px, 1.2vh, 12px) 0 0;
-      white-space: nowrap;
-    }
-
-    /* photo stretches to the bio column's natural height — no explicit
-       height needed, so the ratio stays proportionate at any panel size.
-       Named .id-row (not .panel-body) because .panel-body is already the
-       shared content-area class every project/module overlay panel uses —
-       reusing it here overrode their layout too. */
-    .id-row {
-      display: flex;
-      align-items: stretch;
-      gap: clamp(16px, 2.6vw, 28px);
-      margin-top: clamp(10px, 1.8vh, 20px);
-      min-height: 0;
-    }
-
-    .id-photo {
-      flex: none;
-      width: clamp(120px, 15vw, 210px);
-      border-radius: 10px;
+      width: clamp(200px, 15.5vw, 260px);
+      height: clamp(260px, 34vh, 400px);
+      border-radius: 3px;
       overflow: hidden;
-      border: 1px solid rgba(160, 205, 235, .55);
-      background: rgba(10, 14, 20, .5);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, .45), 0 0 0 4px rgba(140, 190, 230, .07), inset 0 0 0 1px rgba(0, 0, 0, .25);
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .6);
     }
 
-    .id-photo img {
+    .intro-portrait img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: 50% 18%;
-      filter: saturate(.9) contrast(1.03);
+      object-position: 50% 15%;
+      filter: saturate(.88) contrast(1.02);
     }
 
-    .panel-bio {
+    .intro-text {
       flex: 1 1 auto;
       min-width: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      max-width: 420px;
     }
 
-    .exterior-content .sub {
-      color: #dbe4ea;
-      font-size: clamp(11.5px, 1.05vw, 14.5px);
-      line-height: 1.36;
-      margin-top: clamp(6px, 1.1vh, 12px);
+    .intro-kicker {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 500;
+      font-size: clamp(13px, 1.3vw, 15px);
+      letter-spacing: .02em;
+      color: #c7bfae;
     }
 
-    .exterior-content .sub:first-child {
-      margin-top: 0;
+    .exterior-content h1 {
+      font-family: "Archivo", sans-serif;
+      font-weight: 700;
+      letter-spacing: -.015em;
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.06;
+      margin: clamp(6px, 1vh, 10px) 0 0;
+      color: #f6f2ec;
     }
 
-    .exterior-content .tag-row {
-      flex: none;
-      font-family: "IBM Plex Mono", monospace;
-      font-size: clamp(10px, 1vw, 12px);
-      letter-spacing: .05em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-top: clamp(10px, 1.8vh, 20px);
-      padding-top: clamp(9px, 1.5vh, 16px);
-      border-top: 1px solid rgba(140, 190, 230, .16);
+    .intro-bio {
+      color: #d8d1c4;
+      font-size: clamp(14px, 1.15vw, 16px);
+      line-height: 1.55;
+      margin-top: clamp(14px, 2.2vh, 20px);
+    }
+
+    .intro-disciplines {
+      font-family: "IBM Plex Sans", sans-serif;
+      font-size: clamp(12.5px, 1vw, 13.5px);
+      letter-spacing: .01em;
+      color: #a89e8c;
+      margin-top: clamp(16px, 2.6vh, 24px);
+      padding-top: clamp(14px, 2.2vh, 18px);
+      border-top: 1px solid rgba(240, 230, 215, .14);
     }
 
     /* door hotspot — positioned over the habitat doorway in mars-exterior-v2.jpg
-       (measured against the native 1490x832 image: door opening centers around
-       x 54%, y 55%). background-position:center keeps this accurate across
-       viewport widths since cover-cropping stays symmetric about the center. */
+       (door opening centers around x 54%, y 57% in this render).
+       background-position:center keeps this accurate across viewport widths
+       since cover-cropping stays symmetric about the center. */
     .door-hotspot-wrap {
       position: absolute;
       left: 54%;
-      top: 55%;
+      top: 57%;
       transform: translate(-50%, -50%);
       z-index: 3;
     }
 
-    /* door / secondary buttons — subtle, no pulsing glow */
+    /* an understated text action rather than a boxed HUD button — a hairline
+       underline and a small shift on hover/focus is enough to read as
+       interactive without looking like an arcade prompt */
     .door-hotspot {
       position: relative;
       z-index: 3;
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      background: rgba(10, 14, 20, .55);
-      border: 1px solid rgba(140, 190, 230, .5);
-      border-radius: 6px;
-      padding: 14px 24px;
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 12.5px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: #f3f5f7;
+      gap: 8px;
+      background: none;
+      border: none;
+      border-radius: 3px;
+      padding: 8px 4px;
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 500;
+      font-size: 14.5px;
+      letter-spacing: .01em;
+      color: #f3efe7;
       cursor: pointer;
-      transition: border-color .25s, background .25s, transform .2s;
+      transition: color .2s, gap .2s;
+    }
+
+    .door-hotspot::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      bottom: 5px;
+      height: 1px;
+      background: rgba(243, 239, 231, .4);
+      transition: background .2s;
+    }
+
+    .door-hotspot .door-hotspot-arrow {
+      transition: transform .2s;
     }
 
     .door-hotspot:hover,
     .door-hotspot:focus-visible {
-      border-color: var(--accent);
-      background: rgba(209, 122, 74, .18);
-      transform: translateY(-2px);
+      color: #fff;
+      gap: 12px;
       outline: none;
     }
 
+    .door-hotspot:hover::after,
+    .door-hotspot:focus-visible::after {
+      background: rgba(255, 255, 255, .75);
+    }
+
+    .door-hotspot:hover .door-hotspot-arrow,
+    .door-hotspot:focus-visible .door-hotspot-arrow {
+      transform: translateX(3px);
+    }
+
     .door-hotspot:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
+      outline: 1px solid rgba(255, 255, 255, .6);
+      outline-offset: 6px;
     }
 
     /* HUB — monitor hotspot, calibrated to the physical screen bounds in mars-hub-room.jpg
        (measured against the native 1490x840 image: screen spans x 555-935, y 258-452) */
     .monitor-hotspot {
       position: absolute;
-      left: 50%;
-      top: 42.3%;
-      width: 25.5%;
-      height: 23.1%;
+      left: 51%;
+      top: 39%;
+      width: 22%;
+      height: 18%;
       transform: translate(-50%, -50%);
       z-index: 3;
-      background: rgba(120, 170, 220, .04);
-      border: 1px solid rgba(190, 220, 245, .35);
+      background: transparent;
+      border: none;
       border-radius: 3px;
       cursor: pointer;
-      transition: border-color .25s, background .25s;
+      transition: background .25s;
     }
 
+    /* the monitor already reads "PROJECT DATABASE" in the photo itself, so
+       the hotspot itself stays invisible until it's actually being
+       interacted with — a soft glass-clean brighten, not a box drawn on
+       top of the screen. But the photo alone doesn't signal that it's
+       clickable, so a small quiet placard sits just under the bezel,
+       like a real equipment label rather than a HUD prompt. */
     .monitor-hotspot:hover,
     .monitor-hotspot:focus-visible {
-      border-color: #9cc4e8;
-      background: rgba(91, 155, 213, .1);
+      background: rgba(255, 255, 255, .05);
       outline: none;
     }
 
-    .monitor-hotspot .label {
+    .monitor-hotspot:focus-visible {
+      outline: 1px solid rgba(255, 255, 255, .5);
+      outline-offset: 3px;
+    }
+
+    .monitor-hint {
       position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-align: center;
-      padding: 8px;
-      font-family: "IBM Plex Mono", monospace;
-      color: #cfe3f2;
-      background: rgba(6, 9, 13, .3);
-      transition: color .25s, background .25s;
+      left: 51%;
+      top: 51%;
+      transform: translateX(-50%);
+      z-index: 3;
+      white-space: nowrap;
+      pointer-events: none;
+      font-family: "IBM Plex Sans", sans-serif;
+      font-size: clamp(11px, 1.1vw, 13px);
+      letter-spacing: .01em;
+      color: rgba(240, 230, 215, .7);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, .8);
+      opacity: .8;
+      animation: monitor-hint-in .8s .6s both;
+      transition: opacity .25s, color .25s;
     }
 
-    .monitor-hotspot .label-eyebrow {
-      font-size: clamp(7.5px, .85vw, 9px);
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      opacity: .55;
+    .monitor-hotspot:hover~.monitor-hint,
+    .monitor-hotspot:focus-visible~.monitor-hint {
+      opacity: 1;
+      color: #f3efe7;
     }
 
-    .monitor-hotspot .label-cta {
-      font-size: clamp(9.5px, 1.15vw, 12px);
-      letter-spacing: .05em;
-      text-transform: uppercase;
-      font-weight: 600;
+    @keyframes monitor-hint-in {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -4px);
+      }
+
+      to {
+        opacity: .8;
+        transform: translate(-50%, 0);
+      }
     }
 
-    .monitor-hotspot:hover .label,
-    .monitor-hotspot:focus-visible .label {
-      color: #eaf3fb;
-      background: rgba(91, 155, 213, .16);
+    @media (prefers-reduced-motion: reduce) {
+      .monitor-hint {
+        animation: none;
+      }
     }
 
     /* SCREEN — project database panel */
+    /* same restrained material as the intro/monitor: warm dark glass, no
+       blueprint grid, no bright blue HUD border — a continuation of the
+       environment's own palette rather than a UI skin dropped on top */
     .screen-content-panel {
       position: relative;
       z-index: 1;
       width: min(90vw, 1040px);
       max-height: 70vh;
       margin: 15vh auto 0;
-      background: rgba(6, 9, 13, .88);
-      background-image:
-        linear-gradient(rgba(140, 190, 230, .035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(140, 190, 230, .035) 1px, transparent 1px);
-      background-size: 48px 48px, 48px 48px;
-      border: 1px solid rgba(140, 190, 230, .3);
+      background: rgba(14, 12, 10, .86);
+      border: 1px solid rgba(240, 230, 215, .14);
       border-radius: 10px;
       padding: clamp(18px, 3vw, 30px);
       overflow-y: auto;
@@ -2570,12 +2525,12 @@
     .screen-content-head {
       font-family: "IBM Plex Mono", monospace;
       font-size: 12px;
-      letter-spacing: .08em;
+      letter-spacing: .06em;
       text-transform: uppercase;
-      color: #9fb6c6;
+      color: #a89e8c;
       padding-bottom: 14px;
       margin-bottom: 16px;
-      border-bottom: 1px solid rgba(140, 190, 230, .2);
+      border-bottom: 1px solid rgba(240, 230, 215, .14);
     }
 
     /* Projects / Modules tab row inside the database panel */
@@ -2586,13 +2541,12 @@
     }
 
     .db-nav button {
-      font-family: "IBM Plex Mono", monospace;
-      font-size: 10.5px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: #9fb6c6;
+      font-family: "IBM Plex Sans", sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      color: #a89e8c;
       background: none;
-      border: 1px solid rgba(140, 190, 230, .22);
+      border: 1px solid rgba(240, 230, 215, .16);
       border-radius: 3px;
       padding: 7px 16px;
       cursor: pointer;
@@ -2601,14 +2555,14 @@
 
     .db-nav button:hover,
     .db-nav button:focus-visible {
-      color: #eaf3fb;
+      color: #f3efe7;
       outline: none;
     }
 
     .db-nav button[aria-selected="true"] {
-      color: #eaf3fb;
-      border-color: #6ea3cc;
-      background: rgba(91, 155, 213, .14);
+      color: #f3efe7;
+      border-color: rgba(240, 230, 215, .4);
+      background: rgba(240, 230, 215, .08);
     }
 
     .module-tile .hw-meta {
@@ -2616,7 +2570,7 @@
     }
 
     .module-tile .hw-code {
-      color: #6ea3cc;
+      color: #c99a6c;
     }
 
     .secondary-hotspot {
@@ -2640,8 +2594,8 @@
 
     .secondary-hotspot:hover,
     .secondary-hotspot:focus-visible {
-      border-color: var(--accent);
-      background: rgba(91, 155, 213, .15);
+      border-color: rgba(255, 255, 255, .5);
+      background: rgba(255, 255, 255, .08);
       outline: none;
     }
 
@@ -2784,28 +2738,24 @@
         max-height: 80vh;
       }
 
-      /* the photo-beside-bio composition is a desktop/laptop layout; a phone
-         isn't wide enough for a comfortable two-column split at this much
-         text, so stack the photo above the bio instead and let the board
-         take a natural (wrap-driven) height — phones have plenty of vh to
-         scroll-free accommodate that. */
-      .exterior-panel {
-        width: min(84vw, 400px);
-        max-height: none;
-      }
-
-      .exterior-content h1 {
-        white-space: normal;
-      }
-
-      .id-row {
+      /* the portrait-beside-text composition is a desktop/laptop layout; a
+         phone isn't wide enough for a comfortable side-by-side split, so
+         stack the portrait above the text instead — phones have plenty of
+         vh to accommodate that without scrolling. */
+      .intro {
         flex-direction: column;
         align-items: flex-start;
+        gap: 16px;
+        max-width: none;
       }
 
-      .id-photo {
-        width: 100px;
-        height: 100px;
+      .intro-portrait {
+        width: 132px;
+        height: 172px;
+      }
+
+      .intro-text {
+        max-width: 84vw;
       }
 
       /* the door-on-image overlay only reads correctly on wide/desktop crops;
@@ -3710,41 +3660,25 @@
       <div class="enter-transition-tint" aria-hidden="true"></div>
       <div class="enter-transition-vignette" aria-hidden="true"></div>
       <div class="exterior-content">
-        <div class="exterior-panel">
-          <span class="panel-corner panel-corner-tl" aria-hidden="true"></span>
-          <span class="panel-corner panel-corner-tr" aria-hidden="true"></span>
-          <span class="panel-corner panel-corner-bl" aria-hidden="true"></span>
-          <span class="panel-corner panel-corner-br" aria-hidden="true"></span>
-          <div class="panel-topline reveal">
-            <span class="topline-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.7">
-                <path d="M12 2 L21 7 V17 L12 22 L3 17 V7 Z" />
-              </svg>
-            </span>
-            <span>Mechanical &amp; Aerospace Engineer</span>
-            <span class="topline-rule" aria-hidden="true"></span>
+        <div class="intro">
+          <div class="intro-portrait reveal"><img src="images/jesse-headshot.jpg" alt="Portrait of Jesse Ramirez"
+              width="300" height="400" loading="eager"></div>
+          <div class="intro-text">
+            <div class="intro-kicker reveal">Mechanical &amp; Aerospace Engineer</div>
+            <h1 class="reveal">Jesse Ramirez</h1>
+            <p class="intro-bio reveal">I turn complex problems into reliable, tested hardware, working from
+              first-principles analysis through CAD, manufacturing, and physical testing. My work spans propulsion,
+              structures, and thermal systems for aerospace applications, and I'm most engaged by projects that end
+              in real data, not just a simulation.</p>
+            <div class="intro-disciplines reveal">Propulsion · Structures · Thermal · Test Engineering</div>
           </div>
-          <h1 class="reveal">Jesse Ramirez</h1>
-          <div class="id-row">
-            <div class="id-photo reveal"><img src="images/jesse-headshot.jpg" alt="Portrait of Jesse Ramirez"
-                width="220" height="270" loading="eager"></div>
-            <div class="panel-bio">
-              <p class="sub reveal">I'm a mechanical engineer interested in turning complex ideas into reliable,
-                working hardware.</p>
-              <p class="sub reveal">My interests span mechanical design, structures, thermal-fluid systems,
-                propulsion, manufacturing, and testing, especially in aerospace applications where these disciplines
-                must work together.</p>
-              <p class="sub reveal">I enjoy the full engineering process, from requirements and first-principles
-                analysis to CAD, manufacturing, and physical testing. I'm most motivated by challenging projects
-                that produce real hardware, useful data, and a better-informed next design.</p>
-            </div>
-          </div>
-          <div class="tag-row reveal">Propulsion · Structures · Thermal · Test Engineering</div>
         </div>
       </div>
       <div class="door-hotspot-wrap">
-        <button class="door-hotspot reveal" type="button" data-door
-          aria-label="Enter the habitat and view projects">Enter Database <span aria-hidden="true">→</span></button>
+        <button class="door-hotspot reveal" type="button" data-door aria-label="Enter the habitat and view projects">
+          <span>Enter Project Database</span>
+          <span class="door-hotspot-arrow" aria-hidden="true">→</span>
+        </button>
       </div>
     </section>
 
@@ -3756,12 +3690,8 @@
     <!-- STAGE 2 — HUB (full room; monitor is the hotspot) -->
     <section class="stage" id="stage-hub">
       <div class="bg" aria-hidden="true"></div>
-      <button class="monitor-hotspot" type="button" data-monitor aria-label="Open the project database">
-        <span class="label">
-          <span class="label-eyebrow">Engineering Database</span>
-          <span class="label-cta">Open Project Database</span>
-        </span>
-      </button>
+      <button class="monitor-hotspot" type="button" data-monitor aria-label="Open the project database"></button>
+      <span class="monitor-hint" aria-hidden="true">Select to view projects</span>
     </section>
 
     <!-- STAGE 3 — SCREEN (project database, shown after clicking the monitor) -->
