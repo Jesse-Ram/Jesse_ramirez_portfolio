@@ -2868,7 +2868,7 @@
     <div class="wrap">
       <div class="close-wrap reveal">
         <div class="eyebrow" style="justify-content:center">Contact</div>
-        <h2 class="sec" style="margin-top:14px">Let's <span style="color:var(--accent)">connect</span>.</h2>
+        <h1 class="sec" style="margin-top:14px">Let's <span style="color:var(--accent)">connect</span>.</h1>
         <p class="approach">Reach out about propulsion, thermal, structures, or test-engineering work. I'm happy to
           talk about a role, a project, or just the hardware.</p>
 
@@ -2953,7 +2953,7 @@
     // ---- active nav link on scroll ----
     const sections = [...document.querySelectorAll("section[id]")];
     const navMap = {};
-    document.querySelectorAll(".navlinks a").forEach(a => { navMap[a.getAttribute("href").slice(1)] = a; });
+    document.querySelectorAll(".navlinks a").forEach(a => { const id = a.getAttribute("href").split("#")[1]; if (id) navMap[id] = a; });
     const spy = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -2970,7 +2970,7 @@
       const DATA = {
         "regen": {
           code: "01 · PROPULSION", title: "Regen Thrust Chamber",
-          desc: "4.79-kN, 540-psi Inconel 718 regeneratively cooled LOX/RP-1 thrust chamber built with 3D Systems, sizing channels against thermal, boiling, pressure-loss, and 0.45-mm DMP manufacturing constraints.",
+          desc: "Physics-based optimization model for a 4.79-kN, 540-psi Inconel 718 regeneratively cooled thrust chamber, coupling feed-system losses, injector sizing, chamber geometry, and cooling-channel design within thermal, boiling, pressure-loss, and DMP manufacturing constraints.",
           tags: ["4.79 kN / 1,077 lbf", "540 psi", "Inconel 718", "LOX/RP-1", "Metal DMP"], img: "images/regen-cad.jpg"
         },
         "engine-tool": {

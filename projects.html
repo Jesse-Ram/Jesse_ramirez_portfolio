@@ -2880,10 +2880,10 @@
       <div class="proj-head">
         <div class="eyebrow reveal">Project 01 · Propulsion</div>
         <h2 class="sec reveal">Regeneratively Cooled Rocket Thrust Chamber</h2>
-        <p class="proj-desc reveal">I designed a 4.79-kN (1,077 lbf), 540-psi Inconel 718 regeneratively cooled
-          LOX/RP-1 thrust chamber, where the core challenge was reducing hot-gas-side wall temperature while
-          controlling coolant pressure drop and keeping the channels manufacturable within 0.45-mm DMP
-          constraints.</p>
+        <p class="proj-desc reveal">I developed a physics-based optimization model for a 4.79-kN (1,077 lbf),
+          540-psi Inconel 718 regeneratively cooled LOX/RP-1 thrust chamber, coupling feed-system losses, injector
+          sizing, chamber geometry, and cooling-channel design to minimize thermal resistance while keeping the
+          channels manufacturable within 0.45-mm DMP constraints.</p>
       </div>
 
       <div class="subgrid reveal">
@@ -2985,13 +2985,11 @@
       </div>
 
       <div class="gallery g-3 reveal stagger">
-        <!-- ====== REPLACE THIS PLACEHOLDER with your regen thrust-chamber CAD render ====== -->
         <figure class="fig">
           <div class="imgwrap contain"><img src="images/regen-cad.jpg" alt="DMP-printed regen thrust chamber"
               style="max-height:340px"></div>
           <figcaption><b>Fig 1.1</b>. DMP-printed thrust chamber (UC Berkeley STAR · 3D Systems)</figcaption>
         </figure>
-        <!-- =============================================================================== -->
         <figure class="fig">
           <div class="imgwrap cover"><img
               src="images/proj-fig-1-2-instrumented-chamber-on-the-test-stand.jpg"
@@ -3950,7 +3948,7 @@
     // ---- active nav link on scroll ----
     const sections = [...document.querySelectorAll("section[id]")];
     const navMap = {};
-    document.querySelectorAll(".navlinks a").forEach(a => { navMap[a.getAttribute("href").slice(1)] = a; });
+    document.querySelectorAll(".navlinks a").forEach(a => { const id = a.getAttribute("href").split("#")[1]; if (id) navMap[id] = a; });
     const spy = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -3967,7 +3965,7 @@
       const DATA = {
         "regen": {
           code: "01 · PROPULSION", title: "Regen Thrust Chamber",
-          desc: "4.79-kN, 540-psi Inconel 718 regeneratively cooled LOX/RP-1 thrust chamber built with 3D Systems, sizing channels against thermal, boiling, pressure-loss, and 0.45-mm DMP manufacturing constraints.",
+          desc: "Physics-based optimization model for a 4.79-kN, 540-psi Inconel 718 regeneratively cooled thrust chamber, coupling feed-system losses, injector sizing, chamber geometry, and cooling-channel design within thermal, boiling, pressure-loss, and DMP manufacturing constraints.",
           tags: ["4.79 kN / 1,077 lbf", "540 psi", "Inconel 718", "LOX/RP-1", "Metal DMP"], img: "images/regen-cad.jpg"
         },
         "engine-tool": {
