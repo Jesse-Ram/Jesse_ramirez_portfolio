@@ -1439,7 +1439,7 @@
       background: var(--bg);
       color: var(--txt);
       font-family: "IBM Plex Sans", system-ui, sans-serif;
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.65;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
@@ -1860,7 +1860,7 @@
     }
 
     .proj-desc {
-      color: var(--txt-dim);
+      color: var(--txt);
       max-width: 820px;
       margin: 18px 0 0;
       font-size: 16.5px
@@ -2323,7 +2323,95 @@
       align-items: center;
       justify-content: center;
       min-height: 150px;
-      padding: 0
+      padding: 0;
+      position: relative;
+      cursor: zoom-in;
+    }
+
+    .fig .imgwrap::after {
+      content: "⤢ Press to enlarge";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 12, 16, .74);
+      color: #fff;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 7px 13px;
+      border-radius: 999px;
+      white-space: nowrap;
+      opacity: .85;
+      transition: opacity .15s ease, transform .15s ease;
+      pointer-events: none;
+    }
+
+    .fig .imgwrap:hover::after,
+    .fig .imgwrap:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    .fig .imgwrap:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .imgzoom-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 7, 9, .9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .18s ease;
+    }
+
+    .imgzoom-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .imgzoom-backdrop img {
+      max-width: min(94vw, 1200px);
+      max-height: 84vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+    }
+
+    .imgzoom-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .3);
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .imgzoom-caption {
+      position: absolute;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e7ebf0;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12.5px;
+      letter-spacing: .03em;
+      max-width: 80vw;
+      text-align: center;
     }
 
     .fig .imgwrap.contain {
@@ -2623,7 +2711,7 @@
     .tl-list li {
       position: relative;
       padding-left: 18px;
-      color: var(--txt-dim);
+      color: var(--txt);
       font-size: 14.5px;
       line-height: 1.65
     }
@@ -2899,13 +2987,12 @@
         <div class="subrow">
           <div class="lab">My Work</div>
           <div class="body">
-            <p class="muted">Starting from the RPA-generated chamber/throat contour, I developed a Python
+            <p class="muted">Starting from the RPA-generated chamber/throat contour, I built a Python
               thermal-hydraulic model of the throat and chamber cooling regions, evaluating coolant velocity,
               heat-transfer coefficient, wall thermal resistance, wall temperature, coolant heating, and pressure
-              loss station by station. I varied channel count, width, and height to search for feasible geometries,
-              prioritizing thermal performance at the throat first before working to reduce pressure loss through
-              the longer chamber section, and rejected any geometry that violated boiling, temperature,
-              pressure-loss, or manufacturing constraints.</p>
+              loss station by station. I varied channel count, width, and height to find feasible geometries,
+              prioritizing throat thermal performance over chamber pressure loss, and rejected any geometry
+              violating boiling, temperature, pressure-loss, or manufacturing constraints.</p>
             <div class="callout">The channel ribs behave like fins. Increasing channel height adds wetted area and
               improves heat transfer to the coolant, but only until fin efficiency, pressure drop, and manufacturing
               limits take over.</div>
@@ -2976,10 +3063,10 @@
           <div class="lab">What I Learned</div>
           <div class="body">
             <p>Optimal channel geometry isn't a single number, it's a balance that shifts station-to-station between
-              cooling performance, pressure budget, and what the printer can actually build. Framing it as a
-              constrained, multi-objective problem made those tradeoffs explicit instead of accidental. The model
-              produced candidate channel dimensions for the internal CAD geometry and, just as usefully, surfaced
-              which thermal and hydraulic assumptions most needed validation against test data.</p>
+              cooling performance, pressure budget, and manufacturability. Framing it as a constrained,
+              multi-objective problem made those tradeoffs explicit. The model produced candidate channel dimensions
+              for the CAD geometry and surfaced which thermal and hydraulic assumptions most needed validation
+              against test data.</p>
           </div>
         </div>
       </div>
@@ -3058,10 +3145,9 @@
           <div class="lab">Objective</div>
           <div class="body">
             <p>Sizing an engine by hand means re-running performance, cooling, and flow calculations every time a
-              constraint changes, thrust target, chamber pressure, or a channel that turns out unmanufacturable. I
-              needed to convert target thrust, propellants, burn duration, feed conditions, and vehicle constraints
-              into a defined operating point and geometry, fast enough to iterate in seconds, not a spreadsheet
-              rebuild.</p>
+              constraint changes: thrust target, chamber pressure, or an unmanufacturable channel. I needed to
+              convert target thrust, propellants, burn duration, feed conditions, and vehicle constraints into a
+              defined operating point and geometry in seconds, not a spreadsheet rebuild.</p>
           </div>
         </div>
         <div class="subrow">
@@ -3109,10 +3195,9 @@
           <div class="lab">Result</div>
           <div class="body">
             <p>This workflow produced the design parameters and external contour for the Inconel 718 regenerative
-              thrust chamber, the geometric foundation for cooling-channel development and detailed manufacturing
-              design. Turning engine sizing into a repeatable, fast design loop paid off well beyond the time saved,
-              it made the coupling between performance, cooling, and flow legible instead of implicit, so a change
-              to one constraint immediately showed its cost against the other two.</p>
+              thrust chamber, the geometric foundation for cooling-channel development and manufacturing design. The
+              payoff went beyond speed: it made the coupling between performance, cooling, and flow explicit, so a
+              change to one constraint immediately showed its cost against the other two.</p>
           </div>
         </div>
       </div>
@@ -3155,9 +3240,9 @@
         <div class="subrow">
           <div class="lab">Problem</div>
           <div class="body">
-            <p>STAR's hot-fire campaigns needed a ground and fluid system built before any engine could safely reach
-              a test stand, and flight-ready avionics prepared for re-hotfire on the launch vehicle. Both had to
-              handle pressurized propellant and instrumentation reliably under real test conditions.</p>
+            <p>STAR's hot-fire campaigns needed a ground and fluid system before any engine could safely reach a
+              test stand, and flight-ready avionics for re-hotfire on the launch vehicle. Both had to handle
+              pressurized propellant and instrumentation reliably under real test conditions.</p>
           </div>
         </div>
         <div class="subrow">
@@ -3650,17 +3735,15 @@
           <div class="body">
             <p>I ran failure logic across the architecture so no single component loss ends the mission: if patch
               heaters fail, switches + insulation limit overcooling; if the radiator fails, heat pipes + switches
-              redirect heat; if the VCHP fails, heaters + switches hold thermal balance. The goal was to design out
-              single-point thermal failures.</p>
+              redirect heat; if the VCHP fails, heaters + switches hold thermal balance.</p>
           </div>
         </div>
         <div class="subrow">
           <div class="lab">Verification Plan</div>
           <div class="body">
             <p>Every requirement mapped to a test, analysis, or inspection: temperature survival via thermal cycling
-              (−40 °C to 50 °C), UV resistance via radiation exposure, coating performance via absorptivity / emissivity
-              analysis, and regulation via heat-switch testing. That's requirements-driven engineering, traced end to
-              end.</p>
+              (−40 °C to 50 °C), UV resistance via radiation exposure, coating performance via absorptivity /
+              emissivity analysis, and regulation via heat-switch testing.</p>
           </div>
         </div>
       </div>
@@ -4068,6 +4151,55 @@
           else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         }
       });
+    })();
+  </script>
+
+  <div class="imgzoom-backdrop" data-imgzoom-backdrop>
+    <button class="imgzoom-close" type="button" data-imgzoom-close aria-label="Close enlarged image">×</button>
+    <img data-imgzoom-img alt="" />
+    <div class="imgzoom-caption" data-imgzoom-caption></div>
+  </div>
+  <script>
+    // ---- figure image enlarge ----
+    (function () {
+      const zoomBackdrop = document.querySelector("[data-imgzoom-backdrop]");
+      const zoomImg = document.querySelector("[data-imgzoom-img]");
+      const zoomCaption = document.querySelector("[data-imgzoom-caption]");
+      const zoomClose = document.querySelector("[data-imgzoom-close]");
+      if (!zoomBackdrop || !zoomImg) return;
+
+      function openZoom(imgEl) {
+        zoomImg.src = imgEl.currentSrc || imgEl.src;
+        zoomImg.alt = imgEl.alt || "";
+        const fig = imgEl.closest("figure");
+        const cap = fig ? fig.querySelector("figcaption") : null;
+        zoomCaption.textContent = cap ? cap.textContent : "";
+        zoomBackdrop.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeZoom() {
+        zoomBackdrop.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document.querySelectorAll(".fig .imgwrap").forEach((wrap) => {
+        wrap.setAttribute("tabindex", "0");
+        wrap.setAttribute("role", "button");
+        wrap.setAttribute("aria-label", "Press to enlarge image");
+        wrap.addEventListener("click", () => {
+          const img = wrap.querySelector("img");
+          if (img) openZoom(img);
+        });
+        wrap.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            const img = wrap.querySelector("img");
+            if (img) openZoom(img);
+          }
+        });
+      });
+      zoomClose.addEventListener("click", closeZoom);
+      zoomBackdrop.addEventListener("click", (e) => { if (e.target === zoomBackdrop) closeZoom(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
     })();
   </script>
 </body>

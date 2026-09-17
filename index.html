@@ -1440,7 +1440,7 @@
       background: var(--bg);
       color: var(--txt);
       font-family: "IBM Plex Sans", system-ui, sans-serif;
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.65;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
@@ -1861,7 +1861,7 @@
     }
 
     .proj-desc {
-      color: var(--txt-dim);
+      color: var(--txt);
       max-width: 820px;
       margin: 18px 0 0;
       font-size: 16.5px
@@ -3138,7 +3138,95 @@
       align-items: center;
       justify-content: center;
       min-height: 150px;
-      padding: 0
+      padding: 0;
+      position: relative;
+      cursor: zoom-in;
+    }
+
+    .fig .imgwrap::after {
+      content: "⤢ Press to enlarge";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 12, 16, .74);
+      color: #fff;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 7px 13px;
+      border-radius: 999px;
+      white-space: nowrap;
+      opacity: .85;
+      transition: opacity .15s ease, transform .15s ease;
+      pointer-events: none;
+    }
+
+    .fig .imgwrap:hover::after,
+    .fig .imgwrap:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    .fig .imgwrap:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .imgzoom-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 7, 9, .9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .18s ease;
+    }
+
+    .imgzoom-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .imgzoom-backdrop img {
+      max-width: min(94vw, 1200px);
+      max-height: 84vh;
+      object-fit: contain;
+      border-radius: 4px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+    }
+
+    .imgzoom-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .3);
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .imgzoom-caption {
+      position: absolute;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #e7ebf0;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12.5px;
+      letter-spacing: .03em;
+      max-width: 80vw;
+      text-align: center;
     }
 
     .fig .imgwrap.contain {
@@ -3438,7 +3526,7 @@
     .tl-list li {
       position: relative;
       padding-left: 18px;
-      color: var(--txt-dim);
+      color: var(--txt);
       font-size: 14.5px;
       line-height: 1.65
     }
@@ -5502,6 +5590,55 @@
       }
       fromHash();
       window.addEventListener("popstate", fromHash);
+    })();
+  </script>
+
+  <div class="imgzoom-backdrop" data-imgzoom-backdrop>
+    <button class="imgzoom-close" type="button" data-imgzoom-close aria-label="Close enlarged image">×</button>
+    <img data-imgzoom-img alt="" />
+    <div class="imgzoom-caption" data-imgzoom-caption></div>
+  </div>
+  <script>
+    // ---- figure image enlarge ----
+    (function () {
+      const zoomBackdrop = document.querySelector("[data-imgzoom-backdrop]");
+      const zoomImg = document.querySelector("[data-imgzoom-img]");
+      const zoomCaption = document.querySelector("[data-imgzoom-caption]");
+      const zoomClose = document.querySelector("[data-imgzoom-close]");
+      if (!zoomBackdrop || !zoomImg) return;
+
+      function openZoom(imgEl) {
+        zoomImg.src = imgEl.currentSrc || imgEl.src;
+        zoomImg.alt = imgEl.alt || "";
+        const fig = imgEl.closest("figure");
+        const cap = fig ? fig.querySelector("figcaption") : null;
+        zoomCaption.textContent = cap ? cap.textContent : "";
+        zoomBackdrop.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+      function closeZoom() {
+        zoomBackdrop.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+      document.querySelectorAll(".fig .imgwrap").forEach((wrap) => {
+        wrap.setAttribute("tabindex", "0");
+        wrap.setAttribute("role", "button");
+        wrap.setAttribute("aria-label", "Press to enlarge image");
+        wrap.addEventListener("click", () => {
+          const img = wrap.querySelector("img");
+          if (img) openZoom(img);
+        });
+        wrap.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            const img = wrap.querySelector("img");
+            if (img) openZoom(img);
+          }
+        });
+      });
+      zoomClose.addEventListener("click", closeZoom);
+      zoomBackdrop.addEventListener("click", (e) => { if (e.target === zoomBackdrop) closeZoom(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
     })();
   </script>
 </body>
